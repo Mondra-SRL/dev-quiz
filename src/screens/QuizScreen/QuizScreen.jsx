@@ -1,25 +1,3 @@
-const mockQuestions = [
-  {
-    id: 1,
-    question: "What does JSX stand for?",
-    answers: [
-      "JavaScript XML",
-      "Java Syntax Extension",
-      "JSON XML",
-      "JavaScript Extension"
-    ],
-    correctAnswer: "JavaScript XML",
-    explanation: "JSX lets you write HTML-like syntax inside JavaScript."
-  },
-  {
-    id: 2,
-    question: "Which React Hook is used to manage local component state?",
-    answers: ["useEffect", "useState", "useContext", "useRef"],
-    correctAnswer: "useState",
-    explanation: "useState adds a state variable that can be updated within a component."
-  }
-];
-
 import { useEffect, useState, useRef } from 'react';
 import ScreenLayout from '../../components/ScreenLayout';
 import QuestionCard from '../../components/QuestionCard/QuestionCard';
@@ -31,6 +9,12 @@ import TimerBar from '../../components/TimerBar';
 import clockIcon from '../../assets/clock-icon.svg';
 import Button from '../../components/Button';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
+import { fetchQuizQuestions } from '../../services/quizApi';
+import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
+import { shuffleArray } from '../../utils/shuffleArray';
+
+// module level constant for questions per quiz
+const QUESTIONS_PER_QUIZ = 10; 
 
 function QuizScreen({
   selectedTopic,
@@ -40,15 +24,57 @@ function QuizScreen({
   onFinish,
   onIncrementScore
 }) {
+  const [questions, setQuestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isValidated, setIsValidated] = useState(false);
   const nextButtonRef = useRef(null);
-  const currentQuestion = mockQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
 
+  // useEffect to fetch questions from API 
+  // keyed on selectedTopic
   useEffect(() => {
-    onSetTotalQuestions(mockQuestions.length);
-  }, [onSetTotalQuestions]);
+    const abortController = new AbortController(); // to cancel the request
+
+    async function loadQuestions() {
+      // variable to get resolvedQuestions 
+      let resolvedQuestions; 
+      // try, catch and finally goes here with await 
+      try {
+        resolvedQuestions = await fetchQuizQuestions(selectedTopic, {
+          signal: abortController.signal,
+        });
+        } catch (err){
+          if (err.name === 'AbortError') return; // our own cleanup , not a failure
+          // fallback questions 
+          const fallback = getFallbackQuestions(selectedTopic.id); 
+          // validation for fallback questions 
+          if (fallback.length === 0){
+            setError(err.message); 
+            setIsLoading(false);
+            return; 
+          }
+          resolvedQuestions = fallback; 
+        }
+        const sessionQuestions = shuffleArray(resolvedQuestions)
+          .slice(0, QUESTIONS_PER_QUIZ)
+          .map((question) => ({
+            ...question, 
+            answers: shuffleArray(question.answers)
+          })); 
+
+          setQuestions(sessionQuestions);
+          onSetTotalQuestions(sessionQuestions.length);
+          setIsLoading(false);
+    }
+
+    loadQuestions();
+
+    return () => abortController.abort();
+  }, [selectedTopic, onSetTotalQuestions]);
+
 
   useEffect(() => {
     if (isValidated && nextButtonRef.current) {
@@ -67,11 +93,30 @@ function QuizScreen({
     }
   };
 
+  // set questions , loading branch and an error branch 
+  if (isLoading) {
+    return (
+      <ScreenLayout>
+        <p>Loading...</p>
+        <Button onClick={onCancel}>Cancel</Button>
+      </ScreenLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <ScreenLayout>
+        <p>{error}</p>
+        <Button onClick={onCancel}>Cancel</Button>
+      </ScreenLayout>
+    );
+  }
+
   const handleNextQuestion = () => {
-    const isLastQuestion = currentQuestionIndex === mockQuestions.length - 1;
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
     if (isLastQuestion) {
-      onFinish();
+      onFinish('completed');
       return;
     }
 
