@@ -1,7 +1,7 @@
 # QuizAPI Research and Validation
 
 **Implementation.** Each topic is served by **one** selected QuizAPI quiz, pinned
-by `quiz_id`. A session fetches that quiz with `limit=10`. 
+by `quiz_id`. A session is that quiz's 10 questions.
 The fallback file for a topic is a copy of that same quiz.
 
 ---
@@ -30,14 +30,23 @@ requests fail in ways that look like API errors.
 
 ## 3. Parameters
 
-Sent on every runtime request:
+`/questions` has two modes: passing `quiz_id` returns that quiz's questions in
+order, omitting it browses all published quizzes with filtering and pagination.
+The app uses the first, which accepts only these two parameters:
 
 | Parameter | Value | Why |
 | --- | --- | --- |
 | `quiz_id` | the topic's quiz | Serves the reviewed quiz for that topic; fetching by category gives no control over language or quality |
 | `include_answers` | `true` | Required for answer text and correctness |
-| `type` | `MULTIPLE_CHOICE` | Internal format has one `correctAnswer` string |
-| `limit` | `10` | Every returned question is used, so this *is* session size |
+
+`category`, `difficulty`, `type`, `tags`, `limit`, `offset`, and `random` are
+browse-mode only and have no effect alongside `quiz_id` — confirmed in the
+OpenAPI spec, and verified in Postman for `limit`.
+
+Nothing can therefore be filtered at request time. The quiz arrives whole, in
+its stored order, with whatever question types it contains. Every guarantee the
+app needs comes from quiz selection (section 6) or from validation in
+`quizApi.js`.
 
 ---
 
@@ -49,7 +58,7 @@ Sent on every runtime request:
 | `answers` are plain strings | same | Map `answers[].text` |
 | Validation compares values, not indexes | `architecture.md` answer randomization | Answer text must be unique within a question |
 | `explanation` required, message if absent | `architecture.md`, `PRD.md` | `include_answers=true`; coverage is a selection criterion |
-| All returned questions used, none trimmed | `architecture.md`, `PRD.md` | `limit` sets session length |
+| All returned questions used, none trimmed | `architecture.md`, `PRD.md` | Session length is the quiz's question count |
 | Retake reloads the topic's questions | `architecture.md` retake flow | Same quiz, same 10 questions; only question and answer order differ |
 | Handle failure, empty, invalid data | `architecture.md` error handling | Plus a dead pinned quiz (section 6) |
 
@@ -92,8 +101,15 @@ An empty result is a **transport success and an application failure**:
 `response.ok` is true and nothing throws, so the service must detect it by
 inspecting `data` rather than by status, then route it to the fallback path
 like any other unusable response. `404` means the pinned id is dead and the
-registry needs fixing; `data: []` means the quiz exists but yielded nothing,
-most likely `type=MULTIPLE_CHOICE` excluding everything — a selection miss.
+registry needs fixing; `data: []` means the quiz still exists but its questions
+were removed.
+
+A response can also be unusable while looking healthy: if the quiz has drifted
+since it was pinned and now contains a `TRUE_FALSE` or `OPEN_ENDED` question,
+or a question with no single correct answer, the app cannot render it. Since
+`type` cannot be filtered at request time, `quizApi.js` validates every
+question and treats the whole response as unusable if any fails — falling back
+to the bundled copy, which holds the quiz as it was when reviewed.
 
 ---
 
@@ -128,9 +144,11 @@ is served by a quiz the team authored. The other five come from public quizzes.
 
 ### Selection criteria
 
-- [ ] At least 10 questions
+- [ ] Exactly 10 questions — the whole quiz becomes the session, so a longer
+      quiz makes a longer quiz session
 - [ ] English throughout
-- [ ] All `MULTIPLE_CHOICE`, exactly one `isCorrect` per question
+- [ ] All `MULTIPLE_CHOICE`, exactly one `isCorrect` per question — `type`
+      cannot be filtered at request time, so the quiz itself must be clean
 - [ ] No duplicate answer text within a question
 - [ ] No position-dependent answers — "All of the above", "None of the above",
       "Both A and C". Answer order is randomized, so these become incoherent
@@ -143,12 +161,13 @@ breaks that topic outright, with no sibling to fall back to.
 ### Discovery
 
 `GET /quizzes?category=<slug>&limit=50` for ids, titles, and `questionCount`.
-Discard anything under 10 questions, then read the remainder with
-`GET /questions?quiz_id=<id>&include_answers=true&limit=10` and apply the
-criteria. Record the chosen quiz above.
+Keep only quizzes with 10 questions, then read each with
+`GET /questions?quiz_id=<id>&include_answers=true` and apply the criteria.
+Record the chosen quiz above.
 
-Quizzes on the platform hold 10 questions, which matches the session size
-exactly. The request returns the whole quiz and nothing is left unused.
+Quizzes on the platform hold 10 questions, which is the session size. A
+`quiz_id` request returns the whole quiz — `limit` is ignored in this mode, so
+question count cannot be capped at request time.
 
 ### Language
 
@@ -171,7 +190,7 @@ changes.
 ## 7. Session
 
 1. User selects a topic; the app looks up that topic's `quiz_id`.
-2. `?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE&limit=10`
+2. `?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
 3. All returned questions become the session, with question order and answer
    order shuffled in the UI layer.
 
@@ -202,7 +221,7 @@ export default [ /* 10 questions */ ];
 Capture with the runtime request, so the copy matches what the app would have
 served:
 
-`GET /questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE&limit=10`
+`GET /questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
 
 Copy the captured JSON into the structure by hand, following the internal
 question format. Sixty questions across six files is a one-off pass, and
@@ -228,14 +247,14 @@ The same assertions apply to API responses at runtime, so this is validation
 
 Runtime request, run against each pinned quiz:
 
-`{{base_url}}/questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE&limit=10`
+`{{base_url}}/questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
 
 Edge cases, each a variation of that request:
 
 | Case | Request |
 | --- | --- |
 | Auth failure | same request, `Authorization` disabled — expect `401` |
-| Unknown quiz id | `?quiz_id=nonexistent&limit=10` |
+| Unknown quiz id | `?quiz_id=nonexistent` |
 | Rate limit | send the runtime request repeatedly; record any throttling |
 
 - [ ] Each pinned quiz returns `200` with exactly 10 questions
@@ -243,7 +262,7 @@ Edge cases, each a variation of that request:
 - [ ] No duplicate answer text within a question
 - [ ] Explanation present, or the fallback message path exercised
 - [ ] Auth failure returns `401`
-- [x] Unknown quiz id returns `404` with `success: false` (section 5)
+- [ ] Unknown quiz id returns `404` with `success: false` (section 5)
 - [ ] Nullable fields recorded below
 - [ ] Rate limits checked
 - [ ] HTML quiz readable with a key that did not create it — only published

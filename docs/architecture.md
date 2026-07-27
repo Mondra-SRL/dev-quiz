@@ -541,27 +541,35 @@ Parameters sent on every request:
 | --- | --- | --- |
 | `quiz_id` | the topic's quiz id | Selects the reviewed quiz |
 | `include_answers` | `true` | Returns answer text and which answer is correct |
-| `type` | `MULTIPLE_CHOICE` | The only question type the app renders |
-| `limit` | `10` | Session length |
+
+These are the only parameters the endpoint accepts when a quiz id is given.
+Category, difficulty, type, tag, and pagination parameters apply only when
+browsing questions across quizzes, which the app never does.
 
 Every topic uses the same request, differing only in `quiz_id`:
 
-`GET /questions?quiz_id=<topic quiz id>&include_answers=true&type=MULTIPLE_CHOICE&limit=10`
+`GET /questions?quiz_id=<topic quiz id>&include_answers=true`
 
-Every returned question is used for the session, so `limit` determines how many
-questions a quiz session contains. Each selected quiz holds 10 questions, so a
-request returns the quiz in full.
+A request by `quiz_id` returns the whole quiz, and every returned question is
+used for the session. Session length is therefore the quiz's own question
+count, which is 10 for each selected quiz.
 
 ### Response Handling
 
 A successful response returns a `data` array of questions. The service must
 distinguish three outcomes:
 
-- Questions returned: normalize and use them
+- Questions returned: validate, normalize, and use them
 - Empty result: the request succeeded but returned no questions, so fallback
   questions are used
 - Quiz not found: the configured quiz id no longer resolves, so fallback
   questions are used and the configuration needs updating
+
+Because the request cannot filter by question type, every question is validated
+after it arrives. A question is unusable if it is not multiple choice, has no
+single correct answer, or is missing required fields. A quiz whose questions no
+longer all pass has drifted from the version that was reviewed, so the response
+is treated as unusable and fallback questions are used for that session.
 
 An empty result arrives with a success status, so it cannot be detected from
 the HTTP status alone.
