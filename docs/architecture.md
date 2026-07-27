@@ -114,6 +114,7 @@ Each topic object contains the information required by the Home screen and Quiz 
 - Topic id
 - Topic name
 - Topic artwork/icon
+- The QuizAPI quiz id used to fetch that topic's questions
 - Any additional topic-specific configuration required by the quiz
 
 ### Utilities
@@ -504,99 +505,66 @@ Quiz questions are fetched from QuizAPI through `src/services/quizApi.js`.
 
 That service is responsible for:
 
-- Fetching questions from QuizAPI
-- Filtering by selected topic if needed
-- Excluding questions from known non-English quizzes
+- Resolving the selected topic to its QuizAPI quiz id
+- Fetching that quiz's questions from QuizAPI
 - Formatting API data into the app's internal shape
 - Handling API response errors
 - Rejecting invalid or incomplete question data
 - Signaling when fallback/mock questions should be used instead
 
-### Endpoint and Authentication
+### Question Source
 
-Base endpoint:
+Each topic is served by one specific QuizAPI quiz, selected and reviewed by the
+team in advance. Questions are requested by that quiz's id, not by category.
+Fetching by category would return questions from any contributed quiz, with no
+control over language or quality.
 
-`GET https://quizapi.io/api/v1/questions`
+The quiz id is configuration, not derived at runtime. It is stored on each
+topic entry in `data/quizTopics.js` alongside that topic's name and artwork, so
+everything describing a topic stays in one place.
 
-The API key must be sent in one of two ways:
+The selected quiz ids and the criteria used to choose them are recorded in
+`docs/quizapi-research.md`.
 
-- `Authorization` header, with the key as the value preceded by the word "Bearer"
-- `api_key` query parameter
+### Request
 
-An `X-Api-Key` header is not recognized and returns `401 Unauthorized`.
+Base URL:
 
-Supported query parameters:
+`https://quizapi.io/api/v1`
 
-`quiz_id`, `include_answers`, `category`, `difficulty`, `type`, `tags`, `limit`, `offset`, `random`
+The app calls one endpoint, `GET /questions`. Authentication uses the
+`Authorization` header, with the key preceded by `Bearer`.
 
-There is no `language`, `lang`, or `locale` parameter.
+Parameters sent on every request:
 
-### Topic to Category Mapping
-
-All six topics are fetched from QuizAPI. The five language topics use existing public quizzes filtered by category. HTML is fetched from a dedicated quiz created by the team in QuizAPI and targeted by its `quiz_id`.
-
-| App topic | QuizAPI filter | Source |
+| Parameter | Value | Purpose |
 | --- | --- | --- |
-| `javascript` | `category=javascript` | Existing public quizzes |
-| `typescript` | `category=typescript` | Existing public quizzes |
-| `python` | `category=python` | Existing public quizzes |
-| `react` | `category=react` | Existing public quizzes |
-| `css` | `category=css` | Existing public quizzes |
-| `html` | `quiz_id=<team HTML quiz id>` | Team-created quiz |
+| `quiz_id` | the topic's quiz id | Selects the reviewed quiz |
+| `include_answers` | `true` | Returns answer text and which answer is correct |
+| `type` | `MULTIPLE_CHOICE` | The only question type the app renders |
+| `limit` | `10` | Session length |
 
-HTML has no dedicated category and too little existing content to fill a session, so the team creates its own HTML quiz in QuizAPI and the app fetches it by `quiz_id`. That `quiz_id` must be recorded in configuration once the quiz exists.
+Every topic uses the same request, differing only in `quiz_id`:
 
-**Mixed question language.** QuizAPI content is contributed per quiz, and language is a property of the individual quiz rather than a request option. One non-English quiz is currently known:
+`GET /questions?quiz_id=<topic quiz id>&include_answers=true&type=MULTIPLE_CHOICE&limit=10`
 
-- Title: `Javascript Quiz`
-- `quiz_id`: `cmpqioi8p04tbqxutobezhcgb`
-- Tags: `basic`, `javascript`, `web`
-- 5 questions, in Indonesian
+Every returned question is used for the session, so `limit` determines how many
+questions a quiz session contains. Each selected quiz holds 10 questions, so a
+request returns the quiz in full.
 
-This quiz sorts early in the `javascript` category, so an unfiltered request is likely to include it. Quizzes carrying specific tags such as `interview`, `debugging`, `hooks`, or `async` `promises` were consistently English, while the generic `basic` and `web` tags identified the non-English quiz.
+### Response Handling
 
-**Thin existing HTML coverage.** The existing public HTML content is only 10 questions from a single quiz (`CSS & HTML Mastery`, `quiz_id` `cmmdjge3c00fcutgryuk42tht`), with no HTML category. Rather than depend on that, the team creates a dedicated HTML quiz in QuizAPI and the app fetches HTML from it by `quiz_id`, as described in Topic to Category Mapping. As with the other topics, `data/fallbackQuestions/html.js` remains the fallback used when the API is unavailable or returns unusable data.
+A successful response returns a `data` array of questions. The service must
+distinguish three outcomes:
 
-### Postman API Requests
+- Questions returned: normalize and use them
+- Empty result: the request succeeded but returned no questions, so fallback
+  questions are used
+- Quiz not found: the configured quiz id no longer resolves, so fallback
+  questions are used and the configuration needs updating
 
-These requests are used to validate the API in Postman before and during service-layer integration. They mirror the requests `quizApi.js` makes at runtime.
-
-Authentication is the same for every request. Add one header:
-
-| Key | Value |
-| --- | --- |
-| `Authorization` | `Bearer <api_key>` |
-
-The `api_key` query parameter also works as an alternative to the header. Requests below show the header form.
-
-**Per-topic question requests.** Method `GET`, base URL `https://quizapi.io/api/v1/questions`, `limit=10` to match the session size.
-
-| Topic | Request URL |
-| --- | --- |
-| `javascript` | `https://quizapi.io/api/v1/questions?category=javascript&limit=10` |
-| `typescript` | `https://quizapi.io/api/v1/questions?category=typescript&limit=10` |
-| `python` | `https://quizapi.io/api/v1/questions?category=python&limit=10` |
-| `react` | `https://quizapi.io/api/v1/questions?category=react&limit=10` |
-| `css` | `https://quizapi.io/api/v1/questions?category=css&limit=10` |
-| `html` | `https://quizapi.io/api/v1/questions?quiz_id=<team HTML quiz id>&limit=10` |
-
-**Supporting requests.**
-
-| Purpose | Request |
-| --- | --- |
-| List categories (no auth required) | `GET https://quizapi.io/api/v1/categories` |
-| List metadata: categories, tags, difficulties (no auth required) | `GET https://quizapi.io/api/v1/metadata` |
-| Auth failure check, expect `401` | `GET https://quizapi.io/api/v1/questions?category=javascript&limit=10` with no key |
-| Unknown category check, confirm empty vs error response | `GET https://quizapi.io/api/v1/questions?category=nonsense&limit=10` |
-
-**Expected success response.** HTTP `200` with a JSON body of the form `{ "success": true, "data": [ ... ] }`, where each item in `data` contains `id`, `text`, `answers` (each with `text` and `isCorrect`), and `explanation`. This is the shape `quizApi.js` normalizes into the internal question format below.
-
-**Testing checklist.**
-
-- Each of the six per-topic requests returns `200` with a non-empty `data` array
-- Every returned question has answers with exactly one `isCorrect` answer
-- The auth failure request returns `401`
-- The unknown category request returns a defined result (empty array or error), matching the fallback behavior in Error Handling
+An empty result arrives with a success status, so it cannot be detected from
+the HTTP status alone.
 
 ### Internal Question Format
 

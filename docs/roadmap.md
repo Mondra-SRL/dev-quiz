@@ -54,17 +54,18 @@ Status key: Completed | In progress | Pending
 - Return Home and Retake Quiz actions are present.
 - Most of the Results UI structure is already built, but final result logic is still pending.
 
-## Phase 9 - Fallback Questions [Pending]
-
-- Create the topic-based fallback question files in `src/data/fallbackQuestions/`.
-- Use the normalized internal question structure defined in `architecture.md`.
-- Replace the inline mock question source with topic-based fallback loading in the Quiz screen.
-
-## Phase 10 - QuizAPI Configuration and Quiz Creation [Pending]
+## Phase 9 - QuizAPI Configuration and Quiz Selection [Pending]
 
 - Finish QuizAPI research, account configuration, and API validation.
-- Create or select QuizAPI quizzes that match the fallback question structure and answers.
+- Select one QuizAPI quiz per topic against the criteria in `quizapi-research.md`, and create the HTML quiz, which has no public equivalent.
+- Record the chosen quiz ids in `quizTopics.js` and in the research registry.
 - Confirm the required question fields, especially explanations, before UI integration.
+
+## Phase 10 - Fallback Questions [Pending]
+
+- Copy each selected quiz into a topic-based fallback question file in `src/data/fallbackQuestions/`.
+- Use the normalized internal question structure defined in `architecture.md`.
+- Replace the inline mock question source with topic-based fallback loading in the Quiz screen.
 
 ## Phase 11 - QuizAPI Service and Quiz Screen Integration [In progress]
 
