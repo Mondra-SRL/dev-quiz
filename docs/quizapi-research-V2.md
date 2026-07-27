@@ -78,7 +78,7 @@ The app uses a simpler question shape than the raw API response.
 | --- | --- | --- |
 | `id` | `id` | Must be non-empty |
 | `question` | `text` | Use the question text directly |
-| `answers` | `answers[].text` | Convert answer objects into plain strings |
+| `answers` | `answers[].text` | Group the API answer texts into one array of strings |
 | `correctAnswer` | the one `answers[].text` where `isCorrect === true` | Reject the question unless there is exactly one |
 | `explanation` | `explanation` | Use fallback text if the value is empty/falsy |
 
@@ -157,14 +157,14 @@ Fill this in once the team agrees on the final quizzes.
 It is also worth copying the final quiz ids into `architecture.md` so the main
 project docs show exactly which QuizAPI resources the app depends on.
 
-| Topic | `quiz_id` | Title | Questions | Date selected | Notes |
-| --- | --- | --- | --- | --- | --- |
-| `html` | | *team-authored* | | | |
-| `css` | | | | | |
-| `javascript` | | | | | |
-| `typescript` | | | | | |
-| `react` | | | | | |
-| `python` | | | | | |
+| Topic | `quiz_id` | Title | Date selected | Notes |
+| --- | --- | --- | --- | --- |
+| `html` | | *team-authored* | | |
+| `css` | | | | |
+| `javascript` | `cmptrjx7502d07gut7cba4vvg` | JavaScript Async Interview Questions for Frontend Developers | `2026-07-27` | |
+| `typescript` | `cmnzuhit0000d2iutbobr9vzj` | TypeScript Type System Fundamentals | `2026-07-27` | |
+| `react` | `cmnzuhl2400c52iuti6q4juba` | React Hooks Deep Dive | `2026-07-27` | |
+| `python` | | | | |
 
 Note:
 
