@@ -114,6 +114,7 @@ Each topic object contains the information required by the Home screen and Quiz 
 - Topic id
 - Topic name
 - Topic artwork/icon
+- The QuizAPI quiz id used to fetch that topic's questions
 - Any additional topic-specific configuration required by the quiz
 
 ### Utilities
@@ -504,12 +505,74 @@ Quiz questions are fetched from QuizAPI through `src/services/quizApi.js`.
 
 That service is responsible for:
 
-- Fetching questions from QuizAPI
-- Filtering by selected topic if needed
+- Resolving the selected topic to its QuizAPI quiz id
+- Fetching that quiz's questions from QuizAPI
 - Formatting API data into the app's internal shape
 - Handling API response errors
 - Rejecting invalid or incomplete question data
 - Signaling when fallback/mock questions should be used instead
+
+### Question Source
+
+Each topic is served by one specific QuizAPI quiz, selected and reviewed by the
+team in advance. Questions are requested by that quiz's id, not by category.
+Fetching by category would return questions from any contributed quiz, with no
+control over language or quality.
+
+The quiz id is configuration, not derived at runtime. It is stored on each
+topic entry in `data/quizTopics.js` alongside that topic's name and artwork, so
+everything describing a topic stays in one place.
+
+The selected quiz ids and the criteria used to choose them are recorded in
+`docs/quizapi-research.md`.
+
+### Request
+
+Base URL:
+
+`https://quizapi.io/api/v1`
+
+The app calls one endpoint, `GET /questions`. Authentication uses the
+`Authorization` header, with the key preceded by `Bearer`.
+
+Parameters sent on every request:
+
+| Parameter | Value | Purpose |
+| --- | --- | --- |
+| `quiz_id` | the topic's quiz id | Selects the reviewed quiz |
+| `include_answers` | `true` | Returns answer text and which answer is correct |
+
+These are the only parameters the endpoint accepts when a quiz id is given.
+Category, difficulty, type, tag, and pagination parameters apply only when
+browsing questions across quizzes, which the app never does.
+
+Every topic uses the same request, differing only in `quiz_id`:
+
+`GET /questions?quiz_id=<topic quiz id>&include_answers=true`
+
+A request by `quiz_id` returns the whole quiz, and every returned question is
+used for the session. Session length is therefore the quiz's own question
+count, which is 10 for each selected quiz.
+
+### Response Handling
+
+A successful response returns a `data` array of questions. The service must
+distinguish three outcomes:
+
+- Questions returned: validate, normalize, and use them
+- Empty result: the request succeeded but returned no questions, so fallback
+  questions are used
+- Quiz not found: the configured quiz id no longer resolves, so fallback
+  questions are used and the configuration needs updating
+
+Because the request cannot filter by question type, every question is validated
+after it arrives. A question is unusable if it is not multiple choice, has no
+single correct answer, or is missing required fields. A quiz whose questions no
+longer all pass has drifted from the version that was reviewed, so the response
+is treated as unusable and fallback questions are used for that session.
+
+An empty result arrives with a success status, so it cannot be detected from
+the HTTP status alone.
 
 ### Internal Question Format
 
