@@ -1,276 +1,306 @@
-# QuizAPI Research and Validation
+# QuizAPI Integration Guide
 
-**Implementation.** Each topic is served by **one** selected QuizAPI quiz, pinned
-by `quiz_id`. A session is that quiz's 10 questions.
-The fallback file for a topic is a copy of that same quiz.
+## Purpose
+
+This document explains how the Quiz App should use QuizAPI.
+
+Use it when you need to:
+
+- choose the quiz used for each topic
+- implement or review `src/services/quizApi.js`
+- create or refresh fallback question files
+- validate that the selected QuizAPI quizzes still work for the app
+
+This is not just general API research. It is an implementation guide for this
+project.
+
+### Simple Example
+
+If you are working on the `react` topic, you would use this doc like this:
+
+1. Check the quiz-selection section to find or shortlist candidate React quizzes.
+2. Review the candidate quiz questions and confirm the quiz has exactly 10 usable questions.
+3. Record the chosen `quiz_id` in the topic registry.
+4. Use the internal question-shape section when implementing or reviewing the mapping in `quizApi.js`.
+5. Write or refresh `src/data/fallbackQuestions/react.js` as separate team-authored questions for the same topic.
+6. Run the validation checklist to confirm the quiz behaves the way the app expects.
+
+That same workflow applies to every topic.
 
 ---
 
-## 1. Setup
+## What The App Depends On
 
-Postman environment `QuizAPI`: `base_url` = `https://quizapi.io/api/v1`,
-`api_key` = your key (secret). Set Bearer auth once at collection level with
-`{{api_key}}` so every request inherits it.
+The app does not fetch questions by category at runtime. Instead, each topic is
+tied to one specific QuizAPI quiz by `quiz_id`.
 
-**Select the `QuizAPI` environment before sending anything.** With "No
-environment" chosen, `{{base_url}}` and `{{api_key}}` resolve to empty and
-requests fail in ways that look like API errors.
+That means:
 
----
+- each topic uses one pinned quiz
+- the app expects that pinned quiz to contain 10 questions, because the quiz-based endpoint returns the quiz's full question set
+- the fallback file for that topic is separate team-authored content, not a copy
+  of the quiz
+- if the pinned quiz becomes unusable, the app falls back to local data until
+  the team chooses a replacement
 
-## 2. Endpoints
+The main runtime call is:
 
-| Endpoint | Auth | App uses | Purpose |
-| --- | --- | --- | --- |
-| `GET /categories` | no | no | Category slugs, discovery only |
-| `GET /questions` | yes | **yes** | The only runtime call |
-| `GET /quizzes` | yes | no | Discover ids, titles, and `questionCount` |
+`GET /questions?quiz_id=<id>&include_answers=true`
 
 ---
 
-## 3. Parameters
+## Runtime Rules
 
-`/questions` has two modes: passing `quiz_id` returns that quiz's questions in
-order, omitting it browses all published quizzes with filtering and pagination.
-The app uses the first, which accepts only these two parameters:
+At runtime, the app should request:
 
-| Parameter | Value | Why |
+| Parameter | Value | Why it matters |
 | --- | --- | --- |
-| `quiz_id` | the topic's quiz | Serves the reviewed quiz for that topic; fetching by category gives no control over language or quality |
-| `include_answers` | `true` | Required for answer text and correctness |
+| `quiz_id` | one pinned quiz per topic | Keeps each topic tied to a reviewed quiz |
+| `include_answers` | `true` | Required to get answer text and correctness data |
 
-`category`, `difficulty`, `type`, `tags`, `limit`, `offset`, and `random` are
-browse-mode only and have no effect alongside `quiz_id` — confirmed in the
-OpenAPI spec, and verified in Postman for `limit`.
+Notes:
 
-Nothing can therefore be filtered at request time. The quiz arrives whole, in
-its stored order, with whatever question types it contains. Every guarantee the
-app needs comes from quiz selection (section 6) or from validation in
-`quizApi.js`.
+- `include_answers=true` affects `answers`, not whether `explanation` exists
+- the API returns an `explanation` field either way, but it may be an empty
+  string
+- when fetching by `quiz_id`, the docs currently describe the endpoint as
+  returning that quiz's ordered questions rather than supporting `type` or
+  pagination filters on the same request
+- because of that, each pinned quiz must itself contain the 10 questions the
+  app session is meant to use
 
 ---
 
-## 4. Requirements Traced to Project Docs
+## Internal Question Shape
 
-| Requirement | Source | Consequence |
+The app uses a simpler question shape than the raw API response.
+
+| App field | QuizAPI source | Rule |
 | --- | --- | --- |
-| `correctAnswer` is one string | `architecture.md` question format | `type=MULTIPLE_CHOICE`; reject zero or multiple correct answers |
-| `answers` are plain strings | same | Map `answers[].text` |
-| Validation compares values, not indexes | `architecture.md` answer randomization | Answer text must be unique within a question |
-| `explanation` required, message if absent | `architecture.md`, `PRD.md` | `include_answers=true`; coverage is a selection criterion |
-| All returned questions used, none trimmed | `architecture.md`, `PRD.md` | Session length is the quiz's question count |
-| Retake reloads the topic's questions | `architecture.md` retake flow | Same quiz, same 10 questions; only question and answer order differ |
-| Handle failure, empty, invalid data | `architecture.md` error handling | Plus a dead pinned quiz (section 6) |
+| `id` | `id` | Must be non-empty |
+| `question` | `text` | Use the question text directly |
+| `answers` | `answers[].text` | Group the API answer texts into one array of strings |
+| `correctAnswer` | the one `answers[].text` where `isCorrect === true` | Reject the question unless there is exactly one |
+| `explanation` | `explanation` | Use fallback text if the value is empty/falsy |
+
+The app expects:
+
+- one correct answer as a string
+- answer options as plain strings
+- answer validation by value, not by original index
+- explanations after submission
+
+Because answers are shuffled in the UI, answer text within a single question
+must be unique.
 
 ---
 
-## 5. Response Shape
+## What To Review Before Pinning A Quiz
 
-```json
-{ "success": true, "data": [ /* questions */ ], "meta": { /* pagination */ } }
-```
+Each topic should be assigned one quiz that passes all of the following checks:
 
-Question: `id, text, answers, explanation`
-Answer: `id, text, isCorrect` (boolean)
+- exactly 10 questions
+- English throughout
+- all questions usable as `MULTIPLE_CHOICE`
+- exactly one correct answer per question
+- no duplicate answer text within a question
+- no position-dependent answers such as "All of the above" or "Both A and C"
+- explanations on most questions
+- reasonable factual quality on a manual skim
 
-`include_answers=true` is what causes `answers` to be returned at all; without
-it there is no answer text and no `isCorrect`.
-
-| Internal | Source |
-| --- | --- |
-| `id` | `id` |
-| `question` | `text` |
-| `answers` | `answers[].text` |
-| `correctAnswer` | `answers.find(a => a.isCorrect).text` — reject unless exactly one |
-| `explanation` | `explanation`, or the standard message when empty, the API returns `""`, not `null`, so test for falsiness rather than null |
-
-`meta` is pagination for the response, not a property of the quiz: `total`
-counts everything matching the filter, `limit` is the page size, `offset` the
-starting position. A quiz's own size is `questionCount` on the quiz object
-returned by `/quizzes`.
-
-Three outcomes the service must tell apart:
-
-| Outcome | Response |
-| --- | --- |
-| Questions found | `200`, `success: true`, populated `data` |
-| Nothing matched | `200`, `success: true`, `data: []`, `meta.total: 0` |
-| Unresolvable quiz id | `404`, `success: false`, `error: "Quiz not found"` |
-
-An empty result is a **transport success and an application failure**:
-`response.ok` is true and nothing throws, so the service must detect it by
-inspecting `data` rather than by status, then route it to the fallback path
-like any other unusable response. `404` means the pinned id is dead and the
-registry needs fixing; `data: []` means the quiz still exists but its questions
-were removed.
-
-A response can also be unusable while looking healthy: if the quiz has drifted
-since it was pinned and now contains a `TRUE_FALSE` or `OPEN_ENDED` question,
-or a question with no single correct answer, the app cannot render it. Since
-`type` cannot be filtered at request time, `quizApi.js` validates every
-question and treats the whole response as unusable if any fails — falling back
-to the bundled copy, which holds the quiz as it was when reviewed.
+These are not nice-to-haves. With one quiz per topic, a bad quiz breaks that
+topic.
 
 ---
 
-## 6. Quiz Selection
+## How To Find Candidate Quizzes
 
-### Config
+Use QuizAPI discovery endpoints only during selection, not at runtime.
 
-One quiz id per topic:
+### Step 1
 
-```js
-html:       '<team-authored-quiz-id>',
-css:        '<quiz-id>',
-javascript: '<quiz-id>',
-typescript: '<quiz-id>',
-react:      '<quiz-id>',
-python:     '<quiz-id>',
-```
+List candidate quizzes for a category:
 
-There is no `html` category on QuizAPI and public HTML content is thin, so HTML
-is served by a quiz the team authored. The other five come from public quizzes.
+`GET /quizzes?category=<slug>&limit=50`
 
-### Registry
+Use this to inspect:
 
-| Topic | `quiz_id` | Title | Questions | Date of selection |
+- quiz ids
+- quiz titles
+- `questionCount`
+
+Discard anything that does not have exactly 10 questions.
+
+### Step 2
+
+Inspect remaining candidates with:
+
+`GET /questions?quiz_id=<id>&include_answers=true`
+
+Read the returned questions and apply the review criteria above.
+
+### Step 3
+
+Record the chosen quiz for the topic in the registry below.
+
+Important constraint:
+
+- QuizAPI does not provide a `language`, `lang`, or `locale` filter for this
+  use case
+- language must therefore be checked manually before pinning a quiz
+
+---
+
+## Topic Registry
+
+Fill this in once the team agrees on the final quizzes.
+
+It is also worth copying the final quiz ids into `architecture.md` so the main
+project docs show exactly which QuizAPI resources the app depends on.
+
+| Topic | `quiz_id` | Title | Date selected | Notes |
 | --- | --- | --- | --- | --- |
-| `html` | | *team-authored* | | |
-| `css` | | | | |
-| `javascript` | | | | |
-| `typescript` | | | | |
-| `react` | | | | |
-| `python` | | | | |
+| `html` | `cms3lywwh0luafbutet1php2w` | HTML Quiz: Intermediate Level | `2026-07-27`| |
+| `css` | `cmnzv5hc400y32iutw5ywxii1` | CSS Layout & Flexbox | `2026-07-27` | |
+| `javascript` | `cmptrjx7502d07gut7cba4vvg` | JavaScript Async Interview Questions for Frontend Developers | `2026-07-27` | |
+| `typescript` | `cmnzuhit0000d2iutbobr9vzj` | TypeScript Type System Fundamentals | `2026-07-27` | |
+| `react` | `cmnzuhl2400c52iuti6q4juba` | React Hooks Deep Dive | `2026-07-27` | |
+| `python` | `cmnzsb1zq001jruuto53x368j` | Python Data Types & Conversions | `2026-07-27` | |
 
-### Selection criteria
+Note:
 
-- [ ] Exactly 10 questions — the whole quiz becomes the session, so a longer
-      quiz makes a longer quiz session
-- [ ] English throughout
-- [ ] All `MULTIPLE_CHOICE`, exactly one `isCorrect` per question — `type`
-      cannot be filtered at request time, so the quiz itself must be clean
-- [ ] No duplicate answer text within a question
-- [ ] No position-dependent answers — "All of the above", "None of the above",
-      "Both A and C". Answer order is randomized, so these become incoherent
-- [ ] Explanations on most questions
-- [ ] Factually correct on a skim
-
-With one quiz per topic these are not preferences — a quiz failing any of them
-breaks that topic outright, with no sibling to fall back to.
-
-### Discovery
-
-`GET /quizzes?category=<slug>&limit=50` for ids, titles, and `questionCount`.
-Keep only quizzes with 10 questions, then read each with
-`GET /questions?quiz_id=<id>&include_answers=true` and apply the criteria.
-Record the chosen quiz above.
-
-Quizzes on the platform hold 10 questions, which is the session size. A
-`quiz_id` request returns the whole quiz — `limit` is ignored in this mode, so
-question count cannot be capped at request time.
-
-### Language
-
-Language is a property of the quiz, not a request option. There is no
-`language`, `lang`, or `locale` parameter. At least one non-English quiz exists
-(`Javascript Quiz`, `cmpqioi8p04tbqxutobezhcgb`, 5 questions, Indonesian), and
-it passed QuizAPI's `approved` moderation, so that step does not screen
-language. Reading a quiz before pinning it is the only safeguard.
-
-### Maintenance
-
-Pinned ids rot: owners can edit, unpublish, or delete quizzes. With one quiz
-per topic there is no redundancy: if a pinned quiz dies, that topic serves
-bundled fallback until someone picks a replacement. Re-verify the registry
-periodically, and re-capture a fallback file when the quiz it was copied from
-changes.
+- there is no useful public HTML category for this project, so `html` is
+  expected to use a team-authored quiz
 
 ---
 
-## 7. Session
+## How A Quiz Session Works
 
-1. User selects a topic; the app looks up that topic's `quiz_id`.
-2. `?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
-3. All returned questions become the session, with question order and answer
-   order shuffled in the UI layer.
+1. The user selects a topic.
+2. The app looks up that topic's pinned `quiz_id`.
+3. The app sends the runtime request.
+4. Returned questions are mapped into the internal question format.
+5. Question order and answer order are shuffled in the UI.
+6. If the API result is unusable, the app uses the local fallback file instead.
 
-**Retake.** The same quiz is refetched and reshuffled, so a retake presents the
-same questions in a different sequence — exactly what `PRD.md` describes under
-Question Randomization. Serving different questions on retake would require
-more than one quiz per topic.
+Retake behavior:
 
-**Failure.** If the request fails, returns empty, or returns a short set, the
-topic falls back to its bundled questions. There is no sibling quiz to try.
+- a retake refetches the same pinned quiz
+- the content should be the same quiz, only reshuffled
+
+Failure behavior:
+
+- no sibling quiz is tried at runtime
+- if the request fails, returns empty, returns invalid data, or returns too few
+  usable questions, the topic should fall back to bundled local content
 
 ---
 
-## 8. Fallback Content
+## Fallback Files
 
-The fallback exists so a quiz can still start when the API is unusable. Each
-topic's file is a copy of that topic's pinned quiz, so online and offline
-content are identical by construction.
+Fallback files exist so a topic can still run if QuizAPI is unavailable or the
+selected quiz becomes unusable.
 
-`src/data/fallbackQuestions/<topic>.js`, a flat array in the internal format of
-section 5, plus the `index.js` lookup `architecture.md` specifies:
+Location:
+
+`src/data/fallbackQuestions/<topic>.js`
+
+Fallback questions are **separate content**, not a copy of the pinned quiz.
+Each file is written by the team for that topic.
+
+Nothing depends on the two sets matching. The app maps both into the same
+internal format, so the quiz screen cannot tell which source it received. What
+a fallback file must match is the contract, not the content:
+
+- exactly 10 questions
+- the same internal format used for API questions
+- the same review criteria applied to pinned quizzes
+- comparable difficulty and tone, so a topic does not change character
+  depending on whether the API was reachable
+
+Writing them independently means the questions are the team's own, which
+removes any question over reusing third-party content, and gives a user who
+plays a topic online and later hits the fallback a set they have not seen.
+
+Suggested header:
 
 ```js
-// Source: quiz <id> "<title>", captured YYYY-MM-DD
+// Topic: react — team-authored fallback, written YYYY-MM-DD
 export default [ /* 10 questions */ ];
 ```
 
-Capture with the runtime request, so the copy matches what the app would have
-served:
+Use `GET /questions?quiz_id=<id>&include_answers=true` on the pinned quiz as a
+reference for format, difficulty, and explanation style — not as text to copy.
 
-`GET /questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
+After writing a fallback file, verify that every question has:
 
-Copy the captured JSON into the structure by hand, following the internal
-question format. Sixty questions across six files is a one-off pass, and
-reading each question while placing it doubles as a content review. The runtime
-mapping stays inside `quizApi.js`, where `architecture.md` assigns it.
-
-**Verify once written.** Reshaping `answers: [{text, isCorrect}]` into plain
-strings plus a separate `correctAnswer` fails silently — a mistyped correct
-answer scores that question wrong forever and nothing errors. Check that every
-question has:
-
-- a `correctAnswer` string exactly matching one entry in its `answers`
-- no duplicate entries in `answers`
-- non-empty `id`, `question`, and `explanation`
-
-The same assertions apply to API responses at runtime, so this is validation
-`quizApi.js` needs anyway.
-
+- a `correctAnswer` string matching exactly one value in `answers`
+- no duplicate answer strings
+- non-empty `id`
+- non-empty `question`
+- non-empty `explanation`, or the standard fallback explanation behavior clearly
+  accounted for
 
 ---
 
-## 9. Validation
+## Response Cases The App Must Handle
 
-Runtime request, run against each pinned quiz:
+The service should distinguish between these outcomes:
 
-`{{base_url}}/questions?quiz_id=<id>&include_answers=true&type=MULTIPLE_CHOICE`
+| Case | Meaning | Expected behavior |
+| --- | --- | --- |
+| `200` with populated `data` | usable result | map and use the questions |
+| `200` with `data: []` | request succeeded, but no usable questions matched | treat as application failure and fall back |
+| `404` with `success: false` | the pinned `quiz_id` is invalid or dead | fall back and update the registry later |
+| network/auth/server failure | request failed | fall back |
 
-Edge cases, each a variation of that request:
+Important detail:
 
-| Case | Request |
-| --- | --- |
-| Auth failure | same request, `Authorization` disabled — expect `401` |
-| Unknown quiz id | `?quiz_id=nonexistent` |
-| Rate limit | send the runtime request repeatedly; record any throttling |
+- `response.ok` alone is not enough
+- an empty `data` array is still an application-level failure for this app
 
-- [ ] Each pinned quiz returns `200` with exactly 10 questions
-- [ ] Every question `MULTIPLE_CHOICE`, exactly one correct answer
-- [ ] No duplicate answer text within a question
-- [ ] Explanation present, or the fallback message path exercised
-- [ ] Auth failure returns `401`
-- [ ] Unknown quiz id returns `404` with `success: false` (section 5)
-- [ ] Nullable fields recorded below
-- [ ] Rate limits checked
-- [ ] HTML quiz readable with a key that did not create it — only published
-      **and approved** quizzes are visible to other keys, and the owner sees
-      their own either way, so testing with the creating key proves nothing
+---
 
-### Recorded results
+## Validation Checklist
 
-```json
-![alt text](image.png)
-```
+Run this against each pinned quiz before relying on it.
+
+Runtime request:
+
+`{{base_url}}/questions?quiz_id=<id>&include_answers=true`
+
+Edge-case requests:
+
+| Case | Request or setup | Expected result |
+| --- | --- | --- |
+| Auth failure | same request with auth disabled | `401` |
+| Unknown quiz id | `?quiz_id=nonexistent&include_answers=true` | `404`, `success: false` |
+| Rate limit | repeat the runtime request several times | record any throttling behavior |
+
+Checklist:
+
+- [ ] the pinned quiz returns `200`
+- [ ] exactly 10 questions are returned, because the pinned quiz itself contains 10 questions
+- [ ] every question is usable for the app's internal format
+- [ ] every question has exactly one correct answer
+- [ ] no duplicate answer text appears within a question
+- [ ] explanation content is acceptable, or fallback explanation behavior is confirmed
+- [ ] auth failure returns `401`
+- [ ] invalid quiz id returns `404`
+- [ ] any nullable or inconsistent fields are recorded
+- [ ] rate-limit behavior is checked
+- [ ] each teammate has created the agreed team-authored HTML quiz in their own QuizAPI account and recorded their own valid `quiz_id`
+
+---
+
+## Quick Start
+
+If you are using this doc for the first time, do the work in this order:
+
+1. Choose one quiz per topic and fill in the registry.
+2. Add the agreed quiz ids to the app config and to `architecture.md`.
+3. Implement or review `quizApi.js` mapping and validation rules.
+4. Write the team-authored fallback file for each topic.
+5. Run the validation checklist against every pinned quiz.
+
+If these five steps are complete, the QuizAPI integration is in a solid state.
