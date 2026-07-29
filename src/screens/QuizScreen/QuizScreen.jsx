@@ -9,12 +9,12 @@ import TimerBar from '../../components/TimerBar';
 import clockIcon from '../../assets/clock-icon.svg';
 import Button from '../../components/Button';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
-import { fetchQuizQuestions } from '../../services/quizApi';
+import { fetchQuizQuestions, MIN_QUESTIONS } from '../../services/quizApi';
 import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
 import { shuffleArray } from '../../utils/shuffleArray';
 
 // module level constant for questions per quiz
-const QUESTIONS_PER_QUIZ = 10; 
+const QUESTIONS_PER_QUIZ = MIN_QUESTIONS;
 
 function QuizScreen({
   selectedTopic,
@@ -48,10 +48,12 @@ function QuizScreen({
         });
         } catch (err){
           if (err.name === 'AbortError') return; // our own cleanup , not a failure
+          // log the error
+          console.warn(err); 
           // fallback questions 
           const fallback = getFallbackQuestions(selectedTopic.id); 
           // validation for fallback questions 
-          if (fallback.length === 0){
+          if (fallback.length < QUESTIONS_PER_QUIZ){
             setError(err.message); 
             setIsLoading(false);
             return; 
