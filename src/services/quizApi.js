@@ -3,16 +3,10 @@
 
 const API_BASE_URL = 'https://quizapi.io/api/v1/questions';
 const API_KEY = import.meta.env.VITE_QUIZ_API_KEY;
-const POOL_SIZE = 50; 
 const explanationNotAvailable = "No explanation available for this question."; 
+const ANSWERS_PER_QUESTION = 4; 
+export const MIN_QUESTIONS = 10; // export this for quizScreen to use
 
-// html quiz url specifically from quizapi.io 
-/* 
-const res = await fetch("https://quizapi.io/api/v1/questions?quiz_id=cms3a30pt0lesfbut0jx2p576&include_answers=true", {
-  headers: { "X-API-Key": "YOUR_API_KEY" }
-});
-const questions = await res.json();
-*/
 
 const buildUrl = (baseUrl, params) => {
   const url = new URL(baseUrl);
@@ -39,7 +33,7 @@ const normalizeQuestion = (apiQuestion) => {
 
   // Phase 3 - Validate the derived valued 
   if (
-    answers.length < 2 ||
+    answers.length !== ANSWERS_PER_QUESTION ||
     answers.length !== rawAnswers.length ||
     new Set(answers).size !== answers.length ||
     correctAnswers.length !== 1
@@ -65,23 +59,17 @@ const normalizeQuestion = (apiQuestion) => {
 
 // export the async function to fetch questions 
 export async function fetchQuizQuestions(topic, { signal} = {}){
-  // guard check if an api key is available
+  // guard check to make sure an api key is present
   if (!API_KEY){
     throw new Error("Missing VITE_QUIZ_API_KEY. Add it to your .env file.");
   }
-  // variable to hold params 
-  const params = { limit: POOL_SIZE, include_answers: true }; 
-  
-  // validation to make sure topic is the api Category 
-  // check if the topic has an apiQuizId or apiCategory or apiTags
-  if (topic?.apiQuizId){
-    params.quiz_id = topic.apiQuizId
-  } else if (topic?.apiCategory){
-    params.category = topic.apiCategory
-  } else if (topic?.apiTags){
-    params.tags = topic.apiTags
+  // validation to check that apiQuizId is present, otherwise throw an error 
+  if(!topic?.apiQuizId){
+    throw new Error(`Missing apiQuizId for topic "${topic?.name ?? 'unknown'}".`);
   }
-
+  // variable to hold params 
+  const params = { quiz_id: topic.apiQuizId, include_answers: true };
+  
   // await response 
   const response = await fetch(buildUrl(API_BASE_URL, params), {
     headers: {Authorization: `Bearer ${API_KEY}`},
@@ -97,15 +85,16 @@ export async function fetchQuizQuestions(topic, { signal} = {}){
   const payload = await response.json(); // convert to json
   const apiQuestions = Array.isArray(payload?.data) ? payload.data : [];
 
-  // grab queesions and normalize them 
+  // grab questions and normalize them 
   const questions = apiQuestions
     .map(normalizeQuestion)
     .filter((question) => question !== null); 
 
   // validate the questions array length 
-  if (questions.length === 0){
-    throw new Error(`QuizAPI returned no usable questions for this topic.`)
+  if (questions.length < MIN_QUESTIONS){
+    throw new Error(`QuizAPi returned ${questions.length} usable questions for "${topic.name}", needs ${MIN_QUESTIONS}.`);
   }
 
   return questions; 
 }
+
