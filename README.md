@@ -152,14 +152,18 @@ Please keep implementations aligned with the agreed scope and architecture.
 
 ## Current Scope
 
-The current MVP includes:
+The current project state includes:
 
-* Topic selection
-* Bundled quiz questions
+* Topic selection for HTML, CSS, JavaScript, TypeScript, React, and Python
 * Quiz flow from Home to Results
-* Immediate answer validation
-* Question explanations
-* Results screen
-* Timer UI placeholder
+* Question loading from QuizAPI with bundled fallback question sets per topic
+* Ten-question quiz sessions with shuffled questions and answer options
+* Immediate answer validation with per-question feedback
+* Question explanations, including a default fallback message when none is provided
+* Score tracking, final results, and retake or return-home actions
+* A direct exit-to-home action during the quiz
+* Timer UI placeholder only; countdown behavior is not implemented yet
+* Planned backend proxy work is not implemented yet
 
 For the complete scope, refer to the PRD.
+
