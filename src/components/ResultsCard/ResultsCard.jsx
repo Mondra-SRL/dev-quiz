@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './ResultsCard.module.css';
+import { getPerformanceBand } from '../../data/resultsMessages';
 
 function ResultsCard({ score, totalQuestions }) {
   const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
@@ -14,22 +15,12 @@ function ResultsCard({ score, totalQuestions }) {
     return () => cancelAnimationFrame(animationFrame);
   }, [percentage]);
 
-    // hardcoding for now, but potentially could be dynamic based on quiz category and score percentage
-  let resultTitle, resultDescription;
-  switch (true){
-    case percentage >= 80: 
-      resultTitle = 'Great Work!';
-      resultDescription = 'You really know your stuff. Keep it up!';
-      break;
-    case percentage >= 50: 
-      resultTitle = "Good Effort!";
-      resultDescription = `A little more practice and you'll ace it.`; 
-      break;
-    default:
-      resultTitle = "Keep going!"; 
-      resultDescription = `Review the topic and try again - you'll get there.`;
-  }
-
+    // get result title and description based on the percentage
+  const band = getPerformanceBand(percentage);
+  const [resultMessage] = useState(
+    () => band.messages[Math.floor(Math.random() * band.messages.length)]
+  )
+  
   return (
     <div className={styles.resultsCard}>
             <div className={styles.scoreCard}>
@@ -44,8 +35,8 @@ function ResultsCard({ score, totalQuestions }) {
               </div>
     
               <div className={styles.resultsCopy} aria-live="polite">
-                <h2>{resultTitle}</h2>
-                <p>{resultDescription}</p>
+                <h2>{band.title}</h2>
+                <p>{resultMessage}</p>
               </div>
     </div>
   )
