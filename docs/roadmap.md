@@ -45,78 +45,84 @@ Status key: Completed | In progress | Pending
 ## Phase 7 - Quiz Screen with Mock Data [Completed]
 
 - The Quiz screen UI is implemented around the agreed component structure.
-- The current quiz flow uses hardcoded mock questions with immediate validation, feedback, explanation, score updates, and question progression.
-- Timer and Exit Quiz behavior are still placeholder-level at this stage.
+- The current quiz flow supports immediate validation, feedback, explanation, score updates, and question progression.
+- Timer and Exit Quiz confirmation behavior are still placeholder-level at this stage.
 
 ## Phase 8 - Results Screen [Completed]
 
 - The Results screen exists and is connected to the shared quiz flow.
 - Return Home and Retake Quiz actions are present.
-- Most of the Results UI structure is already built, but final result logic is still pending.
+- Final score display and performance messaging are implemented.
 
-## Phase 9 - QuizAPI Configuration and Quiz Selection [Pending]
+## Phase 9 - QuizAPI Configuration and Quiz Selection [Completed]
 
-- Finish QuizAPI research, account configuration, and API validation.
-- Select one QuizAPI quiz per topic against the criteria in `quizapi-research.md`, and create the HTML quiz, which has no public equivalent.
-- Record the chosen quiz ids in `quizTopics.js` and in the research registry.
-- Confirm the required question fields, especially explanations, before UI integration.
+- QuizAPI research, topic selection, and topic quiz ids are recorded in the repo.
+- One QuizAPI quiz is configured per topic in `quizTopics.js`.
+- The selected quiz data and validation notes are tracked in `quizapi-research.md`.
 
-## Phase 10 - Fallback Questions [Pending]
+## Phase 10 - Fallback Questions [Completed]
 
-- Copy each selected quiz into a topic-based fallback question file in `src/data/fallbackQuestions/`.
-- Use the normalized internal question structure defined in `architecture.md`.
-- Replace the inline mock question source with topic-based fallback loading in the Quiz screen.
+- Topic-based fallback question files exist in `src/data/fallbackQuestions/`.
+- The fallback questions use the shared internal question structure.
+- The Quiz screen can load bundled fallback questions when API data is unavailable or unusable.
 
-## Phase 11 - QuizAPI Service and Quiz Screen Integration [In progress]
+## Phase 11 - QuizAPI Service and Quiz Screen Integration [Completed]
 
-- `src/services/quizApi.js` exists but is still a stub and needs the full service-layer logic from `architecture.md`.
-- Fetch, validate, and normalize QuizAPI responses before the Quiz screen uses them.
-- Connect API questions to the Quiz screen and fall back to bundled local questions when API data is unavailable or unusable.
+- `src/services/quizApi.js` fetches, validates, and normalizes QuizAPI responses.
+- The Quiz screen loads API-backed questions through the service layer.
+- Local fallback questions are used when API data is unavailable or unusable.
 
-## Phase 12 - Results Screen Finalization [In progress]
+## Phase 12 - Backend Proxy for QuizAPI [Pending]
 
-- Replace placeholder result content with the final score, total questions, performance messaging, and quiz status.
-- Ensure Return Home and Retake Quiz follow the final quiz data flow.
-- Align the Results screen with the completed and expired quiz outcomes.
+- Introduce a lightweight Node.js Vercel Function backend proxy to protect the QuizAPI key.
+- Create the `api/` Vercel Function and update the frontend to call the local `/api/*` endpoint.
+- Configure local full-stack development with `vercel dev`.
 
-## Phase 13 - Global Timer [Pending]
+## Phase 13 - Results Screen Finalization [In progress]
+
+- Final score display and performance messaging are in place.
+- Align the Results screen with completed and expired quiz outcomes.
+- Ensure the final results flow includes the intended quiz status handling.
+
+## Phase 14 - Global Timer [Pending]
 
 - Implement the real countdown timer and timer progress bar.
 - Start the timer only after valid questions are ready.
 - Handle expiration through the shared `quizStatus` flow.
 
-## Phase 14 - Question and Answer Randomization [Pending]
+## Phase 15 - Question and Answer Randomization [Completed]
 
-- Randomize questions once per session.
-- Randomize answers while preserving correct-answer validation by value.
-- Reuse the shared shuffle utility as part of the final question-loading flow.
+- Questions are randomized once per session.
+- Answer options are randomized while preserving correct-answer validation by value.
+- The shared shuffle utility is part of the current question-loading flow.
 
-## Phase 15 - Exit Quiz Modal [In progress]
+## Phase 16 - Exit Quiz Modal [In progress]
 
 - Replace the current direct exit action with the confirmation modal flow.
 - Support Continue Quiz and Exit Quiz actions with the correct reset behavior.
 - Keep the timer running while the modal is open.
 
-## Phase 16 - Error and Empty States [Pending]
+## Phase 17 - Error and Empty States [In progress]
 
-- Add loading, API error, invalid response, and unavailable-question states.
-- Prevent the quiz from continuing when no valid question source is available.
-- Allow the user to return Home if neither API nor fallback questions can be used.
+- Loading and no-valid-question error states are present in the Quiz screen.
+- The quiz already falls back to bundled questions when API data is unavailable or unusable.
+- Expand error handling to cover the full final API and proxy flow.
 
-## Phase 17 - UI Polish and Responsiveness [In progress]
+## Phase 18 - UI Polish and Responsiveness [In progress]
 
 - Refine the existing UI to match the approved visual direction across all screens.
 - Complete responsive behavior and consistency passes.
 - Improve accessibility and interaction clarity where needed without changing the agreed layout flow.
 
-## Phase 18 - Testing and Refactoring [Pending]
+## Phase 19 - Testing and Refactoring [Pending]
 
 - Test the full application flow from Home to Quiz to Results and back.
 - Test both API-backed and fallback-question flows.
+- Add coverage for the backend proxy flow once it is implemented.
 - Fix bugs, edge cases, and refactor where needed after the remaining MVP features are in place.
 
-## Phase 19 - Deployment [Pending]
+## Phase 20 - Deployment [Pending]
 
-- Deployment is currently out of scope.
-- The app will not be deployed while the QuizAPI key must be exposed in the frontend.
-- Deployment can be reconsidered later only if the architecture changes.
+- Deployment becomes viable once the backend proxy is implemented and the QuizAPI key is no longer exposed to frontend code.
+- Deploy the app with the frontend and Vercel Function working together.
+- Confirm the deployed environment variables and API-backed quiz flow before release.
