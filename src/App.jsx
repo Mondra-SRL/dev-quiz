@@ -15,6 +15,7 @@ function App() {
  
     setScore(0);
     setTotalQuestions(0);
+    setQuizStatus(null);
     setCurrentScreen('quiz');
   }
 
@@ -35,6 +36,7 @@ function App() {
     setSelectedTopic(null);
     setScore(0);
     setTotalQuestions(0);
+    setQuizStatus(null);
     setCurrentScreen('home');
   }
 
