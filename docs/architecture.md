@@ -2,11 +2,10 @@
 
 ## OVERVIEW
 
-The Quiz App is a frontend-only React application built with Vite. Users select a programming topic, complete a timed quiz, receive immediate answer validation, view feedback and explanations, and then see a final results summary. From the Results screen, users can retake the same topic without returning to Home.
+The Quiz App uses a React frontend built with Vite and a lightweight Node.js Vercel Function backend proxy for QuizAPI requests. Users select a programming topic, complete a timed quiz, receive immediate answer validation, view feedback and explanations, and then see a final results summary. From the Results screen, users can retake the same topic without returning to Home.
 
 MVP exclusions:
 
-- No backend
 - No database
 - No authentication
 - No local storage
@@ -17,7 +16,7 @@ Core architectural decisions:
 - `App.jsx` owns app-level navigation and shared quiz session state
 - `QuizScreen.jsx` owns the active quiz session UI and local interaction state
 - React state is the only state management solution
-- API access is isolated in `src/services/quizApi.js`
+- QuizAPI access is isolated behind a Vercel Function, while `src/services/quizApi.js` communicates with the local `/api/*` endpoint
 - QuizAPI is the primary question source, with bundled fallback/mock questions used when API data is unavailable or unusable
 - Questions and answer options are randomized in the UI layer
 
@@ -27,6 +26,7 @@ Contributors must have the following installed to run the project locally:
 
 - Node.js
 - npm
+- Vercel CLI (installed as a development dependency for local backend-proxy development)
 
 All project dependencies should be installed and managed using npm.
 
@@ -36,6 +36,8 @@ Alternative package managers (Yarn, pnpm, Bun, etc.) are currently out of scope 
 
 ```txt
 project-root/
+|-- api/
+|   `-- quiz.js
 |-- src/
 |   |-- assets/
 |   |-- components/
@@ -102,7 +104,11 @@ Each screen lives in its own folder (`ScreenName/`) containing the `.jsx` file, 
 
 ### Services
 
-- `quizApi.js`: Handles fetching and formatting quiz data from QuizAPI.
+- `quizApi.js`: Handles fetching and formatting quiz data through the local backend proxy (`/api/*`).
+
+### Vercel Functions
+
+- `api/quiz.js`: Vercel Function that proxies requests to QuizAPI.
 
 ### Data
 
@@ -352,7 +358,7 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 - `App.jsx` owns cross-screen state and navigation
 - `QuizScreen.jsx` owns in-progress quiz interaction state
 - Presentational components receive data and callbacks via props
-- `quizApi.js` fetches and formats API data before the UI uses it
+- `quizApi.js` communicates with the local backend proxy and formats API data before the UI uses it
 - The quiz session can continue with bundled fallback/mock questions if API data is unusable
 
 ### Flow Between Layers
@@ -360,12 +366,13 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 1. `HomeScreen.jsx` calls `handleSelectTopic()` on each topic card selection, updating `selectedTopic` in `App.jsx`.
 2. `App.jsx` switches `currentScreen` from `home` to `quiz`.
 3. `QuizScreen.jsx` requests questions through `quizApi.js`.
-4. `quizApi.js` fetches, validates, and formats the API response.
-5. `QuizScreen.jsx` stores randomized questions locally and sends `totalQuestions` upward to `App.jsx`.
-6. Quiz interactions update local quiz state; `QuizScreen.jsx` calls `incrementScore()` on each correct answer and updates `quizStatus` through the setter or callback passed down from `App.jsx`.
-7. `App.jsx` switches to `results` when the quiz finishes or expires.
-8. `ResultsScreen.jsx` reads final shared state and offers either reset navigation back to `home` or a retake action that starts a new quiz session for the same topic.
-
+4. `quizApi.js` calls the local `/api/quiz` Vercel Function.
+5. The Vercel Function requests quiz data from QuizAPI and returns the response to the frontend.
+6. `quizApi.js` validates and formats the response for the UI, or signals that fallback/mock questions should be used if the proxy or API response is unavailable or unusable.
+7. `QuizScreen.jsx` stores randomized questions locally and sends `totalQuestions` upward to `App.jsx`.
+8. Quiz interactions update local quiz state; `QuizScreen.jsx` calls `incrementScore()` on each correct answer and updates `quizStatus` through the setter or callback passed down from `App.jsx`.
+9. `App.jsx` switches to `results` when the quiz finishes or expires.
+10. `ResultsScreen.jsx` reads final shared state and offers either reset navigation back to `home` or a retake action that starts a new quiz session for the same topic.
 ## QUIZ FLOW
 
 ### Session Start
@@ -501,12 +508,12 @@ When the user clicks Retake Quiz on the Results screen:
 
 ## API LOGIC
 
-Quiz questions are fetched from QuizAPI through `src/services/quizApi.js`.
+Quiz questions are requested by the frontend through `src/services/quizApi.js`, which calls the local `/api/quiz` Vercel Function.
 
 That service is responsible for:
 
 - Resolving the selected topic to its QuizAPI quiz id
-- Fetching that quiz's questions from QuizAPI
+- Requesting that quiz's questions through the Vercel Function proxy
 - Formatting API data into the app's internal shape
 - Handling API response errors
 - Rejecting invalid or incomplete question data
@@ -528,12 +535,8 @@ The selected quiz ids and the criteria used to choose them are recorded in
 
 ### Request
 
-Base URL:
-
-`https://quizapi.io/api/v1`
-
-The app calls one endpoint, `GET /questions`. Authentication uses the
-`Authorization` header, with the key preceded by `Bearer`.
+The frontend calls the local `/api/quiz` endpoint through `quizApi.js`.
+The Vercel Function then requests `GET /questions` from QuizAPI and sends the API key in the `Authorization` header using `Bearer` authentication.
 
 Parameters sent on every request:
 
@@ -546,7 +549,7 @@ These are the only parameters the endpoint accepts when a quiz id is given.
 Category, difficulty, type, tag, and pagination parameters apply only when
 browsing questions across quizzes, which the app never does.
 
-Every topic uses the same request, differing only in `quiz_id`:
+Every topic uses the same upstream QuizAPI request, differing only in `quiz_id`:
 
 `GET /questions?quiz_id=<topic quiz id>&include_answers=true`
 
@@ -556,7 +559,7 @@ count, which is 10 for each selected quiz.
 
 ### Response Handling
 
-A successful response returns a `data` array of questions. The service must
+A successful proxy response returns a `data` array of questions. The service must
 distinguish three outcomes:
 
 - Questions returned: validate, normalize, and use them
@@ -604,21 +607,20 @@ If a question has no explanation, show a fallback message such as:
 `No explanation available for this question.`
 
 The same explanation is shown whether the answer is correct or incorrect.
-
 ## ENVIRONMENT VARIABLES
 
 ### Required Variables
 
 ```env
-VITE_QUIZ_API_KEY=your_api_key_here
+QUIZ_API_KEY=your_api_key_here
 ```
 
 Notes
-- Environment variables are accessed through import.meta.env.
+- `QUIZ_API_KEY` is read only by the Vercel Function and must not be exposed to frontend code.
+- This key must not use the `VITE_` prefix.
 - API keys should not be hardcoded in source files.
-- .env should be included in .gitignore.
-- .env.example should be committed to the repository.
-
+- `.env` should be included in `.gitignore`.
+- `.env.example` should be committed to the repository.
 ## QUIZ LOGIC RULES
 
 ### Question Randomization
@@ -685,10 +687,9 @@ If no valid question source is available at all:
 - Use CSS
 - Use Vite
 - Use React state only
-- Use QuizAPI
+- Use a lightweight Node.js Vercel Function proxy for QuizAPI requests
 - Use bundled fallback/mock questions when API data is unavailable, errors, or is invalid
 - No React Router
-- No backend
 - No database
 - No authentication
 - No local storage
