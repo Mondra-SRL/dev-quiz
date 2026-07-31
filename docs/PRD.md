@@ -225,12 +225,16 @@ If confirmed:
 - JavaScript
 - CSS
 - Vite
+- Node.js
+- Vercel Functions
 
 ### API
 
 - QuizAPI
-- Questions fetched directly from the frontend
-- QuizAPI key stored in environment variables
+- React frontend calls a local /api/* endpoint
+- Node.js Vercel Function backend proxy requests questions from QuizAPI and returns the response to the frontend
+- Vercel Function securely reads QUIZ_API_KEY from environment variables
+- QuizAPI key is never exposed to browser code
 - Bundled fallback/mock questions are used when QuizAPI is unavailable or returns unusable data
 
 ### STATE MANAGEMENT
@@ -275,3 +279,4 @@ React state manages:
 - Leaderboards
 - Difficulty levels
 - Multiplayer
+
