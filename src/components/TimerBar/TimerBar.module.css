@@ -8,14 +8,12 @@
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
-
-.timerBar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  width: 48%;
+/* update the progress-bar*/
+.fill {
+  height: 100%;
   background: linear-gradient(180deg, var(--accent-primary-subtle, rgba(198, 217, 126, 0.80)) 0%, var(--accent-primary-strong, rgba(92, 115, 39, 0.80)) 100%);
   border-radius: var(--radius-pill);
+  transition: width 1s linear;
 }
 
 @media (max-width: 768px) {
