@@ -5,14 +5,18 @@ import QuizSelector from '../../components/QuizSelector';
 import ScreenLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
 import quizTopics from '../../data/quizTopics';
-import ArrowRightIcon from '../../components/ArrowRightIcon';
+import arrowRightIconMerino from '../../assets/arrow-right-icon-merino.svg';
 
 function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
   const buttonRef = useRef(null);
 
   useEffect(() => {
     if (selectedTopic && buttonRef.current) {
-      buttonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      buttonRef.current.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
     }
   }, [selectedTopic]);
   return (
@@ -33,7 +37,8 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
 
       <div ref={buttonRef}>
         <Button variant="primary" onClick={onStart} disabled={!selectedTopic}>
-          Start Quiz <ArrowRightIcon />
+          Start Quiz
+          <img src={arrowRightIconMerino} alt="" aria-hidden="true" />
         </Button>
       </div>
     </ScreenLayout>

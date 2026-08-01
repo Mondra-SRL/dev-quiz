@@ -10,7 +10,7 @@
   height: 44px;
   width: auto;
 
-  @media (max-width: 768px) {
+  @media (max-width: 48em) {
     height: 36px;
     width: auto;
   }
@@ -25,9 +25,8 @@
   width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   button {
     width: 100%;
   }
 }
-  

@@ -3,7 +3,8 @@ import logo from '../../assets/logo-desktop-on-light.svg';
 import Button from '../../components/Button';
 import ResultsCard from '../../components/ResultsCard';
 import ScreenLayout from '../../components/ScreenLayout';
-import ArrowRightIcon from '../../components/ArrowRightIcon';
+import arrowRightIconMerino from '../../assets/arrow-right-icon-merino.svg';
+import arrowRightIconPurple from '../../assets/arrow-right-icon-purple.svg';
 import { QUIZ_STATUS_MESSAGES } from '../../data/resultsMessages'; 
 
 function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onRetakeQuiz}) {
@@ -14,18 +15,20 @@ function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onReta
       <img src={logo} alt="devquiz" className={styles.logo} />
       </header>
 
-      <main className={styles.quizContent}> 
-        <h1 className={styles.headerTitle}>{QUIZ_STATUS_MESSAGES[quizStatus] ?? 'Quiz Complete'}</h1>
+      <section className={styles.quizContent} aria-labelledby="results-heading">
+        <h1 id="results-heading" className={styles.headerTitle}>{QUIZ_STATUS_MESSAGES[quizStatus] ?? 'Quiz Complete'}</h1>
         <ResultsCard score={score} totalQuestions={totalQuestions} />
         <div className={styles.actions}>
           <Button variant="primary" onClick={onRetakeQuiz}>
-            Retake Quiz <ArrowRightIcon />
+            Retake Quiz
+            <img src={arrowRightIconMerino} alt="" aria-hidden="true" />
           </Button>
           <Button variant="secondary" onClick={onReturnHome}>
-            Return Home <ArrowRightIcon />
+            Return Home
+            <img src={arrowRightIconPurple} alt="" aria-hidden="true" />
           </Button>
         </div>
-      </main>
+      </section>
     </ScreenLayout>
   );
 }
