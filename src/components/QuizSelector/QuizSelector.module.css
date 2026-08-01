@@ -1,6 +1,6 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: var(--space-6);
   width: 100%;
   max-width: 1050px;
@@ -19,23 +19,13 @@
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-@media (hover: hover) {
-  .card:hover:not(:has(:checked)) {
-    background: var(--surface-hover);
-    border-color: var(--text-secondary);
-    box-shadow: inset 0 0 0 var(--border-hairline) var(--text-secondary);
-  }
+.card:hover {
+  border-color: var(--text-secondary);
 }
 
 .card:has(:checked) {
   background: var(--accent-secondary-subtle);
   border-color: var(--accent-secondary-strong);
-  border-width: var(--border-thick);
-}
-
-.card:has(input:focus-visible) {
-  outline: var(--border-medium) solid var(--focus-ring);
-  outline-offset: 3px;
 }
 
 .icon {
@@ -68,23 +58,4 @@
 
 .card:has(:checked) .badge {
   display: block;
-}
-
-@media (prefers-contrast: more) {
-  .card {
-    border-width: var(--border-medium);
-  }
-}
-
-@media (forced-colors: active) {
-  .card,
-  .card:has(:checked) {
-    color: CanvasText;
-    background: Canvas;
-    border-color: CanvasText;
-  }
-
-  .card:has(input:focus-visible) {
-    outline-color: Highlight;
-  }
 }

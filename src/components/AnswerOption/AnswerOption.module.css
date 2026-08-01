@@ -15,14 +15,12 @@
 }
 
 .answerOption:has(input:not(:disabled)):hover {
-  background-color: var(--surface-hover);
-  border-color: var(--text-secondary);
-  box-shadow: inset 0 0 0 var(--border-hairline) var(--text-secondary);
+  background-color: var(--color-merino);
 }
 
 .answerOption:has(input:focus-visible) {
-  outline: var(--border-medium) solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: var(--border-thin) dashed var(--accent-primary-default);
+  outline-offset: 2px;
 }
 
 .answerOption:has(input:disabled) {
@@ -32,16 +30,14 @@
 .answerOption[data-state="correct"],
 .answerOption[data-state="reveal"] {
   background: var(--accent-primary-ghost);
-  color: var(--status-success-text);
+  color: var(--accent-primary-strong);
   border-color: var(--border-green);
-  border-inline-start-width: var(--border-thick);
 }
 
 .answerOption[data-state="incorrect"] {
   background: var(--accent-tertiary-ghost);
   color: var(--accent-tertiary-strong);
   border-color: var(--border-red);
-  border-inline-start-width: var(--border-thick);
 }
 
 .letter {
@@ -61,7 +57,7 @@
 .answerOption[data-state="reveal"] .letter {
   background: var(--accent-primary-subtle);
   border-color: var(--border-green);
-  color: var(--status-success-text);
+  color: var(--accent-primary-strong);
 }
 
 .answerOption[data-state="incorrect"] .letter {
@@ -72,40 +68,4 @@
 
 .text {
   display: block;
-  flex: 1;
-}
-
-.statusIndicator {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-bold);
-  line-height: 1;
-  border: var(--border-medium) solid currentColor;
-  border-radius: 50%;
-}
-
-@media (prefers-contrast: more) {
-  .answerOption,
-  .letter {
-    border-width: var(--border-medium);
-  }
-}
-
-@media (forced-colors: active) {
-  .answerOption,
-  .letter,
-  .statusIndicator {
-    color: CanvasText;
-    background: Canvas;
-    border-color: CanvasText;
-  }
-
-  .answerOption:has(input:focus-visible) {
-    outline-color: Highlight;
-  }
 }

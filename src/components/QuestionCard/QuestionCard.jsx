@@ -1,15 +1,10 @@
 import styles from './QuestionCard.module.css';
 import AnswerOption from '../AnswerOption/AnswerOption';
-import { FormattedQuestion } from '../FormattedText';
 
 function QuestionCard({ question, answers, correctAnswer, selectedAnswer, onSelectAnswer }) {
   return (
-    <section className={styles.main} aria-labelledby="question-heading">
-      <FormattedQuestion
-        text={question}
-        id="question-heading"
-        className={styles.question}
-      />
+    <main className={styles.main}>
+      <h1 className={styles.question}>{question}</h1>
       <div className={styles.answersGrid}>
         {answers.map((answer, idx) => {
           const letter = String.fromCharCode(65 + idx);
@@ -36,7 +31,7 @@ function QuestionCard({ question, answers, correctAnswer, selectedAnswer, onSele
           );
         })}
       </div>
-    </section>
+    </main>
   );
 }
 

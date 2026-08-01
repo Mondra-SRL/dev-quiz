@@ -15,16 +15,7 @@ const cssQuestions = [
   },
   {
     id: 'css-2',
-    question: `Given this CSS, what is the total width of the element?
-\`\`\`css
-.box {
-  width: 200px;
-  padding: 20px;
-  border: 5px solid black;
-  margin: 10px;
-  box-sizing: content-box;
-}
-\`\`\``,
+    question: "Given this CSS, what is the total width of the element? ```css .box { width: 200px; padding: 20px; border: 5px solid black; margin: 10px; box-sizing: content-box; } ```",
     answers: [
       "200px",
       "240px",

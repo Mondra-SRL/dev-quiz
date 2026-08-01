@@ -14,11 +14,11 @@
 }
 
 .feedbackMessage.correct {
-  color: var(--status-success-text);
+  color: var(--accent-primary-strong);
 }
 
 .feedbackMessage.incorrect {
-  color: var(--status-error-text);
+  color: var(--accent-tertiary-default);
 }
 
 .label {

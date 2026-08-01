@@ -2,16 +2,10 @@ import styles from './ScreenLayout.module.css';
 import decorBottomLeft from '../../assets/card-decor-bottom-left.svg';
 import decorTopRight from '../../assets/card-decor-top-right.svg';
 
-function ScreenLayout({ children, inert = false }) {
+function ScreenLayout({ children }) {
   return (
-    <div
-      className={styles.canvas}
-      inert={inert ? '' : undefined}
-    >
-      <a className="skip-link" href="#main-content">
-        Skip to main content
-      </a>
-      <main id="main-content" className={styles.card} tabIndex="-1">
+    <div className={styles.canvas}>
+      <div className={styles.card}>
         <img
           src={decorTopRight}
           alt=""
@@ -26,7 +20,7 @@ function ScreenLayout({ children, inert = false }) {
         />
 
         {children}
-      </main>
+      </div>
     </div>
   );
 }

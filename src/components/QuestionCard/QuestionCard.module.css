@@ -9,10 +9,8 @@
 
 .question {
   width: 100%;
-  font-family: var(--font-question);
-  line-height: var(--lh-relaxed);
   text-align: left;
-  font-size: var(--fs-2xl);
+  font-size: var(--fs-3xl);
   margin: 0;
 }
 
@@ -25,7 +23,7 @@
   align-items: start;
 }
 
-@media (max-width: 48em) {
+@media (max-width: 768px) {
   .question {
     text-align: center;
   }
