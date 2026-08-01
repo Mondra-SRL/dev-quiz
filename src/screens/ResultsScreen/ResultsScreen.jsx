@@ -4,8 +4,9 @@ import Button from '../../components/Button';
 import ResultsCard from '../../components/ResultsCard';
 import ScreenLayout from '../../components/ScreenLayout';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
+import { QUIZ_STATUS_MESSAGES } from '../../data/resultsMessages'; 
 
-function ResultsScreen({ score, totalQuestions, onReturnHome, onRetakeQuiz }) {
+function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onRetakeQuiz}) {
   
   return (
     <ScreenLayout>
@@ -14,7 +15,7 @@ function ResultsScreen({ score, totalQuestions, onReturnHome, onRetakeQuiz }) {
       </header>
 
       <main className={styles.quizContent}> 
-        <h1 className={styles.headerTitle}>Quiz Complete</h1>
+        <h1 className={styles.headerTitle}>{QUIZ_STATUS_MESSAGES[quizStatus] ?? 'Quiz Complete'}</h1>
         <ResultsCard score={score} totalQuestions={totalQuestions} />
         <div className={styles.actions}>
           <Button variant="primary" onClick={onRetakeQuiz}>

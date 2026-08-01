@@ -64,6 +64,7 @@ function App() {
       <ResultsScreen
         score={score}
         totalQuestions={totalQuestions}
+        quizStatus={quizStatus}
         onReturnHome={resetQuiz}
         onRetakeQuiz={retakeQuiz}
       />
