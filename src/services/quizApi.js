@@ -1,10 +1,10 @@
 // api to get fetch questions from quizapi.io 
 // module constants
 
+import { getValidQuizQuestions } from '../utils/normalizeQuizQuestion';
+
 const API_BASE_URL = 'https://quizapi.io/api/v1/questions';
 const API_KEY = import.meta.env.VITE_QUIZ_API_KEY;
-const explanationNotAvailable = "No explanation available for this question."; 
-const ANSWERS_PER_QUESTION = 4; 
 export const MIN_QUESTIONS = 10; // export this for quizScreen to use
 
 
@@ -31,13 +31,8 @@ const normalizeQuestion = (apiQuestion) => {
   // variable to hold the correct answers 
   const correctAnswers = rawAnswers.filter((answer) => answer?.isCorrect); 
 
-  // Phase 3 - Validate the derived valued 
-  if (
-    answers.length !== ANSWERS_PER_QUESTION ||
-    answers.length !== rawAnswers.length ||
-    new Set(answers).size !== answers.length ||
-    correctAnswers.length !== 1
-  ){
+  // Phase 3 - Validate values that are specific to the API response.
+  if (answers.length !== rawAnswers.length || correctAnswers.length !== 1) {
     return null; 
   }
 
@@ -50,10 +45,7 @@ const normalizeQuestion = (apiQuestion) => {
     question: apiQuestion.text,
     answers,
     correctAnswer: correctAnswers[0].text,
-    explanation: 
-      typeof explanation === 'string' && explanation.trim() !== ''
-      ? explanation
-      : explanationNotAvailable
+    explanation,
   };
 }; 
 
@@ -86,15 +78,16 @@ export async function fetchQuizQuestions(topic, { signal} = {}){
   const apiQuestions = Array.isArray(payload?.data) ? payload.data : [];
 
   // grab questions and normalize them 
-  const questions = apiQuestions
-    .map(normalizeQuestion)
-    .filter((question) => question !== null); 
+  const questions = getValidQuizQuestions(
+    apiQuestions
+      .map(normalizeQuestion)
+      .filter((question) => question !== null),
+  );
 
   // validate the questions array length 
   if (questions.length < MIN_QUESTIONS){
-    throw new Error(`QuizAPi returned ${questions.length} usable questions for "${topic.name}", needs ${MIN_QUESTIONS}.`);
+    throw new Error(`QuizAPI returned ${questions.length} usable questions for "${topic.name}", needs ${MIN_QUESTIONS}.`);
   }
 
   return questions; 
 }
-

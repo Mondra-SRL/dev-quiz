@@ -3,20 +3,23 @@ import ScreenLayout from '../../components/ScreenLayout';
 import QuestionCard from '../../components/QuestionCard/QuestionCard';
 import FeedbackMessage from '../../components/FeedbackMessage/FeedbackMessage';
 import ExplanationBox from '../../components/ExplanationBox/ExplanationBox';
-import logo from '../../assets/logo-desktop-on-light.svg';
-import styles from './QuizScreen.module.css';
 import TimerBar from '../../components/TimerBar';
-import clockIcon from '../../assets/clock-icon.svg';
 import Button from '../../components/Button';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
+import styles from "./QuizScreen.module.css";
+import logo from "../../assets/logo-desktop-on-light.svg";
+import clockIcon from "../../assets/clock-icon.svg";
 import { fetchQuizQuestions, MIN_QUESTIONS } from '../../services/quizApi';
 import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
 import { shuffleArray } from '../../utils/shuffleArray';
+import { getValidQuizQuestions } from '../../utils/normalizeQuizQuestion';
 
 // module level constant for questions per quiz
 const QUESTIONS_PER_QUIZ = MIN_QUESTIONS;
 // module level constant for the timer countdown
 const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
+const LOAD_ERROR_MESSAGE =
+  "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
 // announce only useful countdown milestones so screen-reader users are not
 // interrupted by an update every second.
@@ -54,6 +57,12 @@ function QuizScreen({
     const abortController = new AbortController(); // to cancel the request
 
     async function loadQuestions() {
+      setIsLoading(true);
+      setError(null);
+      setQuestions([]);
+      setSecondsRemaining(QUIZ_DURATION_SECONDS);
+      onSetTotalQuestions(0);
+
       // variable to get resolvedQuestions
       let resolvedQuestions;
       // try, catch and finally goes here with await
@@ -66,10 +75,12 @@ function QuizScreen({
         // log the error
         console.warn(err);
         // fallback questions
-        const fallback = getFallbackQuestions(selectedTopic.id);
+        const fallback = getValidQuizQuestions(
+          getFallbackQuestions(selectedTopic?.id),
+        );
         // validation for fallback questions
         if (fallback.length < QUESTIONS_PER_QUIZ) {
-          setError(err.message);
+          setError(LOAD_ERROR_MESSAGE);
           setIsLoading(false);
           return;
         }
@@ -92,8 +103,8 @@ function QuizScreen({
     return () => abortController.abort();
   }, [selectedTopic, onSetTotalQuestions]);
 
-  // start the countdown once questions are ready. Clear the interval if
-  // readiness changes or QuizScreen unmounts.
+  // start the countdown once questions are ready. 
+  // clear the interval if readiness changes or QuizScreen unmounts.
   useEffect(() => {
     const quizIsReady = !isLoading && !error && questions.length > 0;
 
@@ -142,8 +153,20 @@ function QuizScreen({
   if (isLoading) {
     return (
       <ScreenLayout>
-        <p>Loading...</p>
-        <Button onClick={onCancel}>Cancel</Button>
+        <section
+          className={styles.statusState}
+          role="status"
+          aria-live="polite"
+        >
+          <div className={styles.spinner} aria-hidden="true" />
+          <h1 className={styles.statusTitle}>Loading questions…</h1>
+          <p className={styles.statusMessage}>
+            We’re getting your quiz ready. This should only take a moment.
+          </p>
+          <Button variant="secondary" onClick={onCancel}>
+            Return Home
+          </Button>
+        </section>
       </ScreenLayout>
     );
   }
@@ -151,8 +174,14 @@ function QuizScreen({
   if (error) {
     return (
       <ScreenLayout>
-        <p>{error}</p>
-        <Button onClick={onCancel}>Cancel</Button>
+        <section className={styles.statusState} role="alert">
+          <p className={styles.errorLabel}>Unable to start quiz</p>
+          <h1 className={styles.statusTitle}>Something went wrong</h1>
+          <p className={styles.statusMessage}>{error}</p>
+          <Button variant="primary" onClick={onCancel}>
+            Return Home
+          </Button>
+        </section>
       </ScreenLayout>
     );
   }
