@@ -4,12 +4,13 @@ import QuestionCard from '../../components/QuestionCard/QuestionCard';
 import FeedbackMessage from '../../components/FeedbackMessage/FeedbackMessage';
 import ExplanationBox from '../../components/ExplanationBox/ExplanationBox';
 import ExitQuizModal from '../../components/ExitQuizModal';
-import logo from '../../assets/logo-desktop-on-light.svg';
+import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import styles from './QuizScreen.module.css';
 import TimerBar from '../../components/TimerBar';
-import clockIcon from '../../assets/clock-icon.svg';
-import arrowRightIconMerino from '../../assets/arrow-right-icon-merino.svg';
-import exitQuizIcon from '../../assets/exit-quiz-icon.svg';
+import clockIcon from '../../assets/svg/clock-icon.svg';
+import arrowRightIconMerino from '../../assets/svg/arrow-right-icon-merino.svg';
+import arrowRightGray from '../../assets/svg/arrow-right-gray.svg';
+import exitQuizIcon from '../../assets/svg/exit-quiz-icon.svg';
 import Button from '../../components/Button';
 import { fetchQuizQuestions, MIN_QUESTIONS } from '../../services/quizApi';
 import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
@@ -290,7 +291,11 @@ function QuizScreen({
           onClick={handleNextQuestion}
         >
           Next Question
-          <img src={arrowRightIconMerino} alt="" aria-hidden="true" />
+          <img
+            src={isValidated ? arrowRightIconMerino : arrowRightGray}
+            alt=""
+            aria-hidden="true"
+          />
         </Button>
       </div>
       </ScreenLayout>

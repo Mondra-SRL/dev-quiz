@@ -1,9 +1,9 @@
-import htmlLogo from '../assets/topic-html-retro-logo.png';
-import cssLogo from '../assets/topic-css-retro-logo.png';
-import jsLogo from '../assets/topic-javascript-retro-logo.png';
-import tsLogo from '../assets/topic-typescript-retro-logo.png';
-import reactLogo from '../assets/topic-react-retro-logo.png';
-import pythonLogo from '../assets/topic-python-retro-logo.png';
+import htmlLogo from '../assets/png/topic-html-retro-logo.png';
+import cssLogo from '../assets/png/topic-css-retro-logo.png';
+import jsLogo from '../assets/png/topic-javascript-retro-logo.png';
+import tsLogo from '../assets/png/topic-typescript-retro-logo.png';
+import reactLogo from '../assets/png/topic-react-retro-logo.png';
+import pythonLogo from '../assets/png/topic-python-retro-logo.png';
 
 const quizTopics = [
   {
