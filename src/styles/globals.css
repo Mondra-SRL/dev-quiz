@@ -5,9 +5,31 @@
    Component-specific rules live in each component's *.module.css.
    ============================================================= */
 
-/* Fonts. Alternatively move this to a <link> in index.html for
-   slightly faster first paint. */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Mono:wght@400;700&display=swap');
+/* Self-hosted fonts avoid a render-blocking request to Google Fonts and keep
+   typography available when the app is offline. */
+@font-face {
+  font-family: 'Fraunces';
+  src: url('../assets/fonts/Fraunces-SemiBold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  src: url('../assets/fonts/SpaceMono-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  src: url('../assets/fonts/SpaceMono-Bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 
 /* ---------- Reset ---------- */
 *,
@@ -127,12 +149,14 @@ small {
 }
 
 a {
-  color: var(--accent-primary-default);
-  text-decoration: none;
+  color: var(--link-text);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.15em;
 }
 
 a:hover {
-  text-decoration: none;
+  text-decoration-thickness: 0.14em;
 }
 
 /* ---------- Action resets ---------- */
@@ -168,9 +192,28 @@ svg {
 /* ---------- Accessibility ---------- */
 /* Dashed offset ring — the shared keyboard-focus indicator. */
 :focus-visible {
-  outline: var(--border-thin) dashed var(--accent-primary-default);
-  outline-offset: 2px;
+  outline: var(--border-medium) solid var(--focus-ring);
+  outline-offset: 3px;
   border-radius: var(--radius-pill);
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  z-index: 2000;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  background: var(--surface-secondary);
+  border: var(--border-medium) solid var(--focus-ring);
+  border-radius: var(--radius-md);
+  transform: translateY(calc(-100% - var(--space-4)));
+  transition: transform 0.15s ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -200,7 +243,46 @@ svg {
   margin: -1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
 
+@media (prefers-contrast: more) {
+  :root {
+    --text-tertiary: var(--text-primary);
+    --border-subtle: var(--text-primary);
+    --action-primary-bg: var(--text-primary);
+    --action-secondary-text: var(--text-primary);
+    --focus-ring: var(--text-primary);
+    --link-text: var(--text-primary);
+    --status-success-text: var(--text-primary);
+    --status-error-text: var(--text-primary);
+  }
+}
+
+@media (forced-colors: active) {
+  body {
+    background: Canvas;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  button,
+  [role="dialog"],
+  [role="progressbar"] {
+    border: var(--border-hairline) solid CanvasText;
+  }
+
+  a {
+    color: LinkText;
+  }
+
+  :focus-visible {
+    outline: var(--border-medium) solid Highlight !important;
+    outline-offset: 3px;
+    box-shadow: none !important;
+  }
+}
