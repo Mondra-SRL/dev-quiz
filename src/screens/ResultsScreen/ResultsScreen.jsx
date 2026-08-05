@@ -1,5 +1,5 @@
 import styles from './ResultsScreen.module.css';
-import logo from '../../assets/logo-desktop-on-light.svg';
+import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import Button from '../../components/Button';
 import ResultsCard from '../../components/ResultsCard';
 import ScreenLayout from '../../components/ScreenLayout';

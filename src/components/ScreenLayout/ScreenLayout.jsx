@@ -1,6 +1,6 @@
 import styles from './ScreenLayout.module.css';
-import decorBottomLeft from '../../assets/card-decor-bottom-left.svg';
-import decorTopRight from '../../assets/card-decor-top-right.svg';
+import decorBottomLeft from '../../assets/svg/card-decor-bottom-left.svg';
+import decorTopRight from '../../assets/svg/card-decor-top-right.svg';
 
 function ScreenLayout({ children, inert = false }) {
   return (
