@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import styles from './HomeScreen.module.css';
-import logo from '../../assets/logo-desktop-on-light.svg';
+import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import QuizSelector from '../../components/QuizSelector';
 import ScreenLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
@@ -37,7 +37,7 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
 
       <div ref={buttonRef}>
         <Button variant="primary" onClick={onStart} disabled={!selectedTopic}>
-          Start Quiz <ArrowRightIcon />
+          Start Quiz <ArrowRightIcon disabled={!selectedTopic} />
         </Button>
       </div>
     </ScreenLayout>

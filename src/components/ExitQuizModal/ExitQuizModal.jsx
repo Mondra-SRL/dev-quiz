@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import styles from './ExitQuizModal.module.css';
-import logo from '../../assets/logo-mobile-on-light.svg';
+import logo from '../../assets/svg/logo-mobile-on-light.svg';
 import Button from '../Button';
-import arrowRightIconMerino from '../../assets/arrow-right-icon-merino.svg';
-import arrowRightIconPurple from '../../assets/arrow-right-icon-purple.svg';
+import arrowRightIconMerino from '../../assets/svg/arrow-right-icon-merino.svg';
+import arrowRightIconPurple from '../../assets/svg/arrow-right-icon-purple.svg';
 
 function ExitQuizModal({ onContinue, onExit, returnFocusRef }) {
   const dialogRef = useRef(null);
