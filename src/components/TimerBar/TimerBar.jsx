@@ -18,7 +18,7 @@ function TimerBar({ percentage }) {
       {/* Use the exact percentage so the fill matches the time remaining. */}
       <div
         className={styles.fill}
-        style={{ width: `${clampedPercentage}%` }}
+        style={{ '--timer-progress': clampedPercentage / 100 }}
       />
     </div>
   );

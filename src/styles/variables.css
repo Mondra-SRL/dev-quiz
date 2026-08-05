@@ -74,6 +74,7 @@
 
     /* Typography — handled via Figma text styles */
     --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-question: 'DM Sans', system-ui, sans-serif;
     --font-ui:      'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
     /* Font-weight */
@@ -109,6 +110,7 @@
     --surface-primary: var(--color-nougat);   /*The standard card or container background */
     --surface-secondary: var(--color-merino);  /*Used for nested containers or subtle content boxes */
     --surface-disabled: var(--color-sand);   /*Used for disabled buttons or inactive form fields */
+    --surface-hover: var(--color-mauve-tint);  /*Used for hover states on cards, buttons, or interactive containers */
     
     --text-primary: var(--color-charcoal); 
     --text-secondary: var(--color-ink);     
