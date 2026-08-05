@@ -12,7 +12,11 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
 
   useEffect(() => {
     if (selectedTopic && buttonRef.current) {
-      buttonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      buttonRef.current.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
     }
   }, [selectedTopic]);
   return (

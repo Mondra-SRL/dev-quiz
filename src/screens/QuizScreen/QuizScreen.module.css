@@ -43,6 +43,12 @@
   justify-content: space-between;
 }
 
+.exitQuizIcon {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+}
+
 .questionCounter {
   font-size: var(--fs-xl);
   font-weight: var(--fw-semibold);
@@ -89,7 +95,7 @@
   line-height: var(--lh-normal);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   .header {
     gap: var(--space-4);
   }

@@ -6,7 +6,7 @@
     width: 100%; /* Full width of the parent */
 
     /* mobile styling for header */ 
-    @media (max-width: 768px){
+    @media (max-width: 48em){
         flex-direction: column; /* Stack children vertically on smaller screens */
     }
 }
@@ -16,7 +16,7 @@
     width: auto; /* Maintain aspect ratio */
 
     /* mobile styles */
-    @media (max-width: 768px){
+    @media (max-width: 48em){
         height: 36px; /* Reduce height for smaller screens */
     }
 }
@@ -41,8 +41,7 @@
     width: 100%; /* Full width of the parent */
     justify-content: center; /* Center children horizontally */
 
-    @media (max-width: 768px){
+    @media (max-width: 48em){
         flex-direction: column; /* Stack children vertically on smaller screens */
     }
 }
-
