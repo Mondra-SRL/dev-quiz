@@ -68,6 +68,7 @@ project-root/
 |   |   |   `-- index.js
 |   |   `-- quizTopics.js
 |   |-- utils/
+|   |   |-- normalizeQuizQuestion.js
 |   |   `-- shuffleArray.js
 |   |-- styles/
 |   |   |-- globals.css
@@ -113,7 +114,7 @@ Each screen lives in its own folder (`ScreenName/`) containing the `.jsx` file, 
 ### Data
 
 - `quizTopics.js`: Stores the available quiz topics and their metadata.
-- `fallbackQuestions/`: Stores bundled fallback/mock questions in one file per topic, plus an `index.js` export for lookup by topic.
+- `fallbackQuestions/`: Stores bundled fallback/mock questions in one file per topic, plus an `index.js` export for lookup by topic. These files are authored in the app's internal question format.
 
 Each topic object contains the information required by the Home screen and Quiz screen, such as:
 
@@ -125,6 +126,7 @@ Each topic object contains the information required by the Home screen and Quiz 
 
 ### Utilities
 
+- `normalizeQuizQuestion.js`: Normalizes and validates questions that are already in the app's internal question format. This shared validation contract applies to fallback questions and to API questions after `quizApi.js` maps the raw API response into the internal shape.
 - `shuffleArray.js`: Randomizes question and answer order.
 
 ### Root Files
@@ -358,7 +360,8 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 - `App.jsx` owns cross-screen state and navigation
 - `QuizScreen.jsx` owns in-progress quiz interaction state
 - Presentational components receive data and callbacks via props
-- `quizApi.js` communicates with the local backend proxy and formats API data before the UI uses it
+- `quizApi.js` communicates with the local backend proxy and maps raw API data into the app's internal question format before validation
+- The shared question normalization utility validates internal-format questions before they are used in a quiz session
 - The quiz session can continue with bundled fallback/mock questions if API data is unusable
 
 ### Flow Between Layers
@@ -381,9 +384,9 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 2. The user selects a topic and starts the quiz.
 3. `App.jsx` stores `selectedTopic` and switches `currentScreen` to `quiz`.
 4. `QuizScreen.jsx` requests questions for the selected topic.
-5. If QuizAPI returns valid questions, they are normalized and used for the session.
-6. If QuizAPI is unavailable, errors, or returns no valid questions, bundled fallback/mock questions are used instead.
-7. The resolved questions are randomized, stored in `questions`, and counted in `totalQuestions`.
+5. If QuizAPI returns valid questions, `quizApi.js` maps them into the internal question format and validates them.
+6. If QuizAPI is unavailable, errors, or returns no valid questions, bundled fallback/mock questions are loaded. Fallback questions are already authored in the internal format and are normalized/validated with the same shared rules before session use.
+7. The resolved valid questions are randomized, stored in `questions`, and counted in `totalQuestions`.
 8. The global timer starts only after questions are ready.
 9. The first question appears with Next Question disabled.
 
