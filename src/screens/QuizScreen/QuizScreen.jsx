@@ -3,12 +3,14 @@ import ScreenLayout from '../../components/ScreenLayout';
 import QuestionCard from '../../components/QuestionCard/QuestionCard';
 import FeedbackMessage from '../../components/FeedbackMessage/FeedbackMessage';
 import ExplanationBox from '../../components/ExplanationBox/ExplanationBox';
+import ExitQuizModal from '../../components/ExitQuizModal';
 import logo from '../../assets/logo-desktop-on-light.svg';
 import styles from './QuizScreen.module.css';
 import TimerBar from '../../components/TimerBar';
 import clockIcon from '../../assets/clock-icon.svg';
+import arrowRightIconMerino from '../../assets/arrow-right-icon-merino.svg';
+import exitQuizIcon from '../../assets/exit-quiz-icon.svg';
 import Button from '../../components/Button';
-import ArrowRightIcon from '../../components/ArrowRightIcon';
 import { fetchQuizQuestions, MIN_QUESTIONS } from '../../services/quizApi';
 import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
 import { shuffleArray } from '../../utils/shuffleArray';
@@ -43,10 +45,12 @@ function QuizScreen({
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isValidated, setIsValidated] = useState(false);
   const nextButtonRef = useRef(null);
+  const exitButtonRef = useRef(null);
   const currentQuestion = questions[currentQuestionIndex];
   const [secondsRemaining, setSecondsRemaining] = useState(
     QUIZ_DURATION_SECONDS,
   );
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
 
   // useEffect to fetch questions from API
   // keyed on selectedTopic
@@ -120,8 +124,9 @@ function QuizScreen({
 
   useEffect(() => {
     if (isValidated && nextButtonRef.current) {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       nextButtonRef.current.scrollIntoView({
-        behavior: "smooth",
+        behavior: reduceMotion ? "auto" : "smooth",
         block: "center",
       });
     }
@@ -188,20 +193,35 @@ function QuizScreen({
 
   const timerAnnouncement = TIMER_ANNOUNCEMENTS[secondsRemaining] ?? "";
 
+  function handleOpenExitModal() {
+    setIsExitModalOpen(true);
+  }
+
+  function handleContinueQuiz() {
+    setIsExitModalOpen(false);
+  }
+
+  function handleConfirmExit() {
+    setIsExitModalOpen(false);
+    onCancel();
+  }
+
   return (
-    <ScreenLayout>
+    <>
+      <ScreenLayout inert={isExitModalOpen}>
       <header className={styles.header}>
         <div className={styles.rowTop}>
           <img src={logo} alt="devquiz" className={styles.logo} />
           <div className={styles.timerMeta}>
             <img
               src={clockIcon}
-              alt="Clock icon"
+              alt=""
+              aria-hidden="true"
               className={styles.clockIcon}
             />
             <p className={styles.timerText}>{formattedTime}</p>
             <p
-              className={styles.srOnly}
+              className="visually-hidden"
               aria-live="polite"
               aria-atomic="true"
             >
@@ -218,28 +238,26 @@ function QuizScreen({
           <p className={styles.questionCounter}>
             Question {currentQuestionIndex + 1} of {totalQuestions}
           </p>
-          <Button variant="tertiary" onClick={onCancel}>
-            EXIT QUIZ{" "}
-            <span aria-hidden="true">
-              {" "}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                fill="currentColor"
-                className="bi bi-x"
-                viewBox="0 0 16 16"
-              >
-                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-              </svg>
-            </span>
+          <Button
+            ref={exitButtonRef}
+            variant="tertiary"
+            onClick={handleOpenExitModal}
+          >
+            EXIT QUIZ
+            <img
+              src={exitQuizIcon}
+              className={styles.exitQuizIcon}
+              alt=""
+              aria-hidden="true"
+            />
           </Button>
         </div>
 
         <div className={styles.topicSummary}>
           <img
             src={selectedTopic.image}
-            alt="Topic icon"
+            alt=""
+            aria-hidden="true"
             className={styles.topicIcon}
           />
           <div className={styles.topicText}>
@@ -271,10 +289,20 @@ function QuizScreen({
           disabled={!isValidated}
           onClick={handleNextQuestion}
         >
-          Next Question <ArrowRightIcon />
+          Next Question
+          <img src={arrowRightIconMerino} alt="" aria-hidden="true" />
         </Button>
       </div>
-    </ScreenLayout>
+      </ScreenLayout>
+
+      {isExitModalOpen && (
+        <ExitQuizModal
+          onContinue={handleContinueQuiz}
+          onExit={handleConfirmExit}
+          returnFocusRef={exitButtonRef}
+        />
+      )}
+    </>
   );
 }
 

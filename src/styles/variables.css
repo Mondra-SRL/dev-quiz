@@ -149,6 +149,7 @@
     --link-text: var(--color-olive-accessible);
     --status-success-text: var(--color-olive-accessible);
     --status-error-text: var(--color-brown);
+    --overlay-scrim: rgba(51, 50, 43, 0.55);
 
     --shadow-content:
       0 4px   4px  0 rgba(0,0,0,0.251),
