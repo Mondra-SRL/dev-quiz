@@ -7,16 +7,16 @@ import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
 import TimerBar from "../../components/TimerBar";
 import Button from "../../components/Button";
 import ArrowRightIcon from "../../components/ArrowRightIcon";
+import ExitQuizModal from "../../components/ExitQuizModal";
 import styles from "./QuizScreen.module.css";
-import logo from "../../assets/logo-desktop-on-light.svg";
-import clockIcon from "../../assets/clock-icon.svg";
+import logo from "../../assets/svg/logo-desktop-on-light.svg";
+import clockIcon from "../../assets/svg/clock-icon.svg";
+import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
 import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
 
-// module level constant for questions per quiz
-const QUESTIONS_PER_QUIZ = MIN_QUESTIONS;
 // module level constant for the timer countdown
 const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
 const MIN_LOADING_DISPLAY_MS = 1000;
@@ -349,11 +349,7 @@ function QuizScreen({
           onClick={handleNextQuestion}
         >
           Next Question
-          <img
-            src={isValidated ? arrowRightIconMerino : arrowRightGray}
-            alt=""
-            aria-hidden="true"
-          />
+          <ArrowRightIcon disabled={!isValidated} />
         </Button>
       </div>
       </ScreenLayout>
