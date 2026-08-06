@@ -22,6 +22,8 @@ const normalizeQuestion = (apiQuestion) => {
     .map((answer) => answer?.text)
     .filter((text) => typeof text === 'string' && text.trim() !== '');
 
+  const correctAnswers = rawAnswers.filter((answer) => answer?.isCorrect);
+
   // Phase 3 - Validate values that are specific to the API response.
   if (answers.length !== rawAnswers.length || correctAnswers.length !== 1) {
     return null; 
