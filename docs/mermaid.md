@@ -1,4 +1,4 @@
-# Quiz App User Flow
+# DevQuiz User Flow
 
 ```mermaid
 flowchart TD

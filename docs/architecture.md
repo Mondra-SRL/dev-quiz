@@ -1,8 +1,8 @@
-# QUIZ APP - ARCHITECTURE
+# DEVQUIZ - ARCHITECTURE
 
 ## OVERVIEW
 
-The Quiz App uses a React frontend built with Vite and a lightweight Node.js Vercel Function backend proxy for QuizAPI requests. Users select a programming topic, complete a timed quiz, receive immediate answer validation, view feedback and explanations, and then see a final results summary. From the Results screen, users can retake the same topic without returning to Home.
+DevQuiz uses a React frontend built with Vite and a lightweight Node.js Vercel Function backend proxy for QuizAPI requests. Users select a programming topic, complete a timed quiz, receive immediate answer validation, view feedback and explanations, and then see a final results summary. From the Results screen, users can retake the same topic without returning to Home.
 
 MVP exclusions:
 

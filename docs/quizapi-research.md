@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document explains how the Quiz App should use QuizAPI.
+This document explains how DevQuiz should use QuizAPI.
 
 Use it when you need to:
 

@@ -1,4 +1,4 @@
-# QUIZ APP - ROADMAP
+# DEVQUIZ - ROADMAP
 
 This roadmap reflects the agreed implementation order, the current repository state, and the existing GitHub issues.
 

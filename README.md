@@ -1,4 +1,4 @@
-# Quiz App
+# DevQuiz
 
 A programming quiz application built with React and Vite.
 
