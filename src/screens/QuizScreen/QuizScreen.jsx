@@ -15,15 +15,11 @@ import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
-import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
 import {
   MIN_LOADING_DISPLAY_MS,
   QUESTIONS_PER_QUIZ,
 } from "../../config/quiz.js";
 
-// module level constant for the timer countdown
-const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
-const MIN_LOADING_DISPLAY_MS = 1000;
 const LOAD_ERROR_MESSAGE =
   "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
