@@ -16,6 +16,7 @@ import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
 import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
+import { MIN_LOADING_DISPLAY_MS } from "
 
 // module level constant for the timer countdown
 const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
