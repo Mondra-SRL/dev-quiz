@@ -55,25 +55,48 @@ QUIZ_API_KEY=your_api_key_here
 
 Note:
 
-* `QUIZ_API_KEY` is read by the local `/api/quiz` backend proxy.
+* `QUIZ_API_KEY` is intended for the planned backend-proxy setup and must be read only by the Vercel Function.
 * Never expose this key to frontend code or prefix it with `VITE_`.
-* Never commit your `.env.local` file.
+* Never commit your `.env` file.
+
+### Vercel CLI
+
+The planned backend proxy uses the Vercel CLI locally so the frontend and Vercel Functions can run together in one development environment.
+
+Add it as a project development dependency with:
+
+```bash
+npm install --save-dev vercel
+```
+
+Contributors who clone the repository normally only need to run `npm install`, because this dependency should already be declared in `package.json` as part of the required backend-proxy setup.
 
 ### Start the Development Server
+
+Use one development mode at a time. Do not run both commands together.
 
 ```bash
 npm run dev
 ```
 
-This is enough to develop and test the app locally, including requests to the `/api/quiz` endpoint. The `api/` folder is handled automatically during local development, so installing the Vercel CLI or running `npm run dev:vercel` is not required for the normal workflow.
+Use this for frontend-only development. It starts only the Vite development server, so local `/api/*` Vercel Functions are not available.
 
-Optional Vercel runtime emulation:
+Planned backend-proxy development command:
 
 ```bash
 npm run dev:vercel
 ```
 
-Use `npm run dev:vercel` only if you specifically want to emulate the Vercel runtime more closely.
+Use this when developing or testing the complete application with the backend proxy.
+
+As part of the required backend-proxy setup, `npm run dev:vercel` should run `vercel dev`, which:
+
+* starts the Vite frontend;
+* serves the local Vercel Functions from the `api/` directory;
+* routes frontend `/api/*` requests to those functions;
+* provides a local environment similar to the deployed Vercel application.
+
+When this script is added, there is no need to run `npm run dev` in a second terminal because `vercel dev` starts the frontend itself.
 
 To test the app from another device on the same local network, start the dev server with host binding:
 
@@ -81,9 +104,11 @@ To test the app from another device on the same local network, start the dev ser
 npm run dev -- --host
 ```
 
+This is for frontend-only network testing and does not test the planned Vercel Function proxy.
+
 ### Backend Proxy Flow
 
-Request flow:
+Planned request flow:
 
 ```text
 React frontend
@@ -110,7 +135,7 @@ package.json
 vite.config.js
 ```
 
-`api/` contains the backend proxy endpoint used during local development and deployment.
+`api/` is the planned location for the Vercel Functions used by the backend proxy.
 
 For the full application structure, refer to the Architecture document.
 
@@ -137,7 +162,8 @@ The current project state includes:
 * Question explanations, including a default fallback message when none is provided
 * Score tracking, final results, and retake or return-home actions
 * A direct exit-to-home action during the quiz
-* The timer is implemented and starts only after loading succeeds
-* Backend proxy requests through the local `/api/quiz` endpoint
+* Timer UI placeholder only; countdown behavior is not implemented yet
+* Planned backend proxy work is not implemented yet
 
 For the complete scope, refer to the PRD.
+
