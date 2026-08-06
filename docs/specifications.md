@@ -39,7 +39,7 @@ Centered column: logo, a display heading, and a one-line subtitle/instruction.
 
 ### 2.3 Start Quiz Button — **Placement: below the grid, centered**
 
-A single primary button ("START QUIZ" + arrow), centered beneath the topic grid. It is the only primary action on the screen and is enabled once a topic is selected.
+A single primary button ("START QUIZ" + arrow), centered beneath the topic grid. It is the only primary action on the screen. The button is disabled by default and becomes enabled once a topic is selected.
 
 - **Mobile UX:** selecting a topic scrolls the Start button into view so the primary action remains reachable on smaller screens.
 
@@ -53,9 +53,12 @@ Order: quiz header → topic context → question → answer options → feedbac
 
 A clock icon + countdown, right-aligned on the same row as the logo.
 
+- A single global countdown applies to the complete quiz.
+- If the timer expires before the final question is completed, the quiz ends and Results is displayed with an expired status.
+
 ### 3.2 Topic Context — **Placement: below the progress bar, left-aligned**
 
-A single inline row displaying the selected topic so the user always knows which quiz they are in. Layout: `[icon] [name] > [description]`
+A single inline row serving as the quiz title and displaying the selected topic so the user always knows which quiz they are in. Layout: `[icon] [name] > [description]`
 
 - **Icon:** the topic artwork image in a small bordered square.
 - **Name:** the topic name in uppercase text.
@@ -68,7 +71,7 @@ A full-width pill track with a fill segment indicating the remaining quiz time. 
 
 ### 3.4 Question Counter — **Placement: row below the progress bar, left**
 
-"QUESTION X OF 10", left-aligned, opposite the Exit control.
+"QUESTION X OF Y", left-aligned, opposite the Exit control. `Y` is the total number of questions in the current quiz.
 
 ### 3.5 Question Presentation — **Decision: text block in the main container, not a bordered sub-card**
 
@@ -78,7 +81,7 @@ The question is a heading-level text block sitting directly in the panel. It is 
 
 Each option is a bordered, rounded tile containing a letter chip (A/B/C/D in its own boxed token) plus the answer text.
 
-- **Selection model:** single-select; selecting an option reveals feedback.
+- **Selection model:** single-select; selecting an option immediately validates the answer and reveals feedback. There is no separate Submit button.
 - **States:** default, hover, selected-correct, selected-incorrect. On an incorrect pick, the correct option is also highlighted.
 
 **Implementation:** same pattern as the topic selector — each tile is a `<label>` wrapping a visually hidden `<input type="radio">`. After validation, a `data-state` attribute is set on each `<label>` to drive the post-validation visual states via CSS:
@@ -98,7 +101,7 @@ After answering, an in-flow feedback block appears (it pushes the Next button do
 
 ### 3.8 Next Question Button — **Placement: bottom of the body, centered**
 
-A single primary button ("NEXT QUESTION" + arrow), centered below the feedback block. Appears once an answer is submitted; on the final question it advances to Results.
+A single primary button ("NEXT QUESTION" + arrow), centered below the feedback block. It is visible but disabled when a question first loads, then becomes enabled after the selected answer is validated. On the final question it advances to Results.
 
 - **Mobile UX:** after answer validation, the screen should scroll the Next button into view so the action is accessible without manual scrolling.
 
@@ -110,18 +113,21 @@ A low-emphasis text control ("EXIT QUIZ" + close glyph), right-aligned opposite 
 
 ## 4. Results Screen
 
-Order: header (logo) → title → score gauge → result copy → Return Home button.
+Order: header (logo) → title → score gauge → result copy → Retake Quiz and Return Home buttons.
 
 ### 4.1 Results Summary Layout — **Decision: centered single column with a circular score gauge**
 
-1. **Title** — "Quiz complete", centered.
+1. **Status title** — centered copy based on how the quiz ended: "Quiz completed!" after the final question or "Time's up!" when the timer expires.
 2. **Score gauge** — a circular progress ring with the score as a fraction in its center ("7/10") above a "SCORE" label.
 3. **Result copy** — a short headline ("Great job!") plus a one–two line encouragement paragraph.
-4. **Return Home button.**
+4. **Actions** — Retake Quiz and Return Home buttons.
 
-### 4.2 Return Home Button — **Placement: bottom of the body, centered**
+### 4.2 Results Actions — **Placement: bottom of the body, centered**
 
-A single primary button ("RETURN HOME" + arrow); the only action on the screen, routing back to Home.
+Two buttons sit side by side below the result copy:
+
+- **Retake Quiz (primary):** a filled button ("RETAKE QUIZ" + arrow) that starts a new quiz session for the same selected topic without returning Home.
+- **Return Home (secondary):** an outlined button ("RETURN HOME" + arrow) that routes back to Home.
 
 ---
 
@@ -129,6 +135,7 @@ A single primary button ("RETURN HOME" + arrow); the only action on the screen, 
 
 - **Trigger:** "EXIT QUIZ" on the Quiz screen.
 - **Type:** centered modal dialog over the screen; underlying screen is inert while open.
+- **Timer:** the global countdown remains visible behind the modal and continues running while it is open.
 - **Structure (single centered column):**
   1. **Logo.**
   2. **Message:** title "Are you sure you want to quit?" + body "Progress will be lost."
@@ -136,6 +143,6 @@ A single primary button ("RETURN HOME" + arrow); the only action on the screen, 
      - **Primary / dismiss (filled, top):** "CONTINUE QUIZ →" — closes the modal and resumes the quiz. Emphasized action.
      - **Secondary / confirm (outlined, bottom):** "EXIT QUIZ →" — abandons the quiz and returns Home. De-emphasized.
 - **Emphasis:** the safe action (continue) is dominant; the destructive action (exit) is de-emphasized and outlined. Buttons are stacked, not side by side.
+- **Confirmed exit:** reset the current quiz state and return the user to Home.
 
 ---
-

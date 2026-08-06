@@ -21,6 +21,10 @@
   overflow: hidden;
 }
 
+.card:focus-visible {
+  outline-offset: calc(-1 * var(--space-2));
+}
+
 .decorTopRight {
   position: absolute;
   top: 0;
@@ -37,7 +41,7 @@
   height: 50px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   .canvas {
     align-items: flex-start;
     padding: 0;
@@ -53,5 +57,20 @@
   .decorTopRight,
   .decorBottomLeft {
     display: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .card {
+    border: var(--border-medium) solid var(--text-primary);
+  }
+}
+
+@media (forced-colors: active) {
+  .card {
+    color: CanvasText;
+    background: Canvas;
+    border: var(--border-hairline) solid CanvasText;
+    box-shadow: none;
   }
 }

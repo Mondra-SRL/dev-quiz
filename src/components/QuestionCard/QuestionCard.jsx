@@ -10,8 +10,7 @@ function QuestionCard({ question, answers, correctAnswer, selectedAnswer, onSele
         id="question-heading"
         className={styles.question}
       />
-      <fieldset className={styles.answersGrid}>
-        <legend className="visually-hidden">Choose one answer</legend>
+      <div className={styles.answersGrid}>
         {answers.map((answer, idx) => {
           const letter = String.fromCharCode(65 + idx);
           let status;
@@ -36,7 +35,7 @@ function QuestionCard({ question, answers, correctAnswer, selectedAnswer, onSele
             />
           );
         })}
-      </fieldset>
+      </div>
     </section>
   );
 }

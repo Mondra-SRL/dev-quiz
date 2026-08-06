@@ -1,6 +1,6 @@
 import styles from './FeedbackMessage.module.css';
-import starIcon from '../../assets/star-icon.svg';
-import badgeIcon from '../../assets/badge-icon.svg';
+import starIcon from '../../assets/svg/star-icon.svg';
+import badgeIcon from '../../assets/svg/badge-icon.svg';
 
 function FeedbackMessage({ isCorrect = false }) {
   const icon = isCorrect ? starIcon : badgeIcon;

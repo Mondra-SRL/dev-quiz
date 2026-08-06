@@ -1,5 +1,5 @@
 import styles from './ResultsScreen.module.css';
-import logo from '../../assets/logo-desktop-on-light.svg';
+import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import Button from '../../components/Button';
 import ResultsCard from '../../components/ResultsCard';
 import ScreenLayout from '../../components/ScreenLayout';
@@ -14,8 +14,8 @@ function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onReta
       <img src={logo} alt="devquiz" className={styles.logo} />
       </header>
 
-      <main className={styles.quizContent}> 
-        <h1 className={styles.headerTitle}>{QUIZ_STATUS_MESSAGES[quizStatus] ?? 'Quiz Complete'}</h1>
+      <section className={styles.quizContent} aria-labelledby="results-heading">
+        <h1 id="results-heading" className={styles.headerTitle}>{QUIZ_STATUS_MESSAGES[quizStatus] ?? 'Quiz Complete'}</h1>
         <ResultsCard score={score} totalQuestions={totalQuestions} />
         <div className={styles.actions}>
           <Button variant="primary" onClick={onRetakeQuiz}>
@@ -25,7 +25,7 @@ function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onReta
             Return Home <ArrowRightIcon />
           </Button>
         </div>
-      </main>
+      </section>
     </ScreenLayout>
   );
 }

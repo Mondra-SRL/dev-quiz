@@ -18,9 +18,11 @@
     --color-lime-tint:    #EBEFD3;
     --color-olive-deep:   #7C9A35;
     --color-olive-ink:    #5C7327;
+    --color-olive-accessible: #546A24;
 
     --color-mauve:        #A98792;
     --color-mauve-deep:   #8E6A76;
+    --color-mauve-ink:    #6F4F5A;
     --color-mauve-tint:   #EBDFE2;
 
     --color-charcoal:     #33322B;
@@ -72,6 +74,7 @@
 
     /* Typography — handled via Figma text styles */
     --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-question: 'DM Sans', system-ui, sans-serif;
     --font-ui:      'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
     /* Font-weight */
@@ -107,10 +110,11 @@
     --surface-primary: var(--color-nougat);   /*The standard card or container background */
     --surface-secondary: var(--color-merino);  /*Used for nested containers or subtle content boxes */
     --surface-disabled: var(--color-sand);   /*Used for disabled buttons or inactive form fields */
+    --surface-hover: var(--color-mauve-tint);  /*Used for hover states on cards, buttons, or interactive containers */
     
     --text-primary: var(--color-charcoal); 
     --text-secondary: var(--color-ink);     
-    --text-tertiary: var(--color-muted-on-dark);
+    --text-tertiary: var(--color-muted-on-light);
     --text-inverse: var(--color-merino);     
 
     --border-subtle: var(--color-ink-soft);
@@ -118,10 +122,10 @@
     --border-red: var(--color-rust);          /* Used for red-accented borders, e.g. incorrect-answer highlights or error states. */
     --border-ghost: var(--color-sand);       /* A very light, almost invisible border color. Used for subtle dividers or focus outlines that shouldn't be too visually heavy. */
 
-    --action-primary-bg: var(--color-olive-deep);  /* Main brand color. Used for primary buttons, active tab lines, or progress bars. */
+    --action-primary-bg: var(--color-olive-accessible);  /* Accessible olive for primary button contrast. */
     --action-primary-text: var(--text-inverse);  /* Text color for primary actions. Should have high contrast against the primary background. */ 
     --action-secondary-bg: var(--color-transparent);  /* Secondary brand color. Used for secondary buttons, secondary feature blocks, or illustrative accents. */
-    --action-secondary-text: var(--color-mauve-deep);  /* Text color for secondary actions. Should have good contrast against the secondary background. */
+    --action-secondary-text: var(--color-mauve-ink);  /* Accessible mauve for secondary actions. */
 
     --accent-primary-default: var(--color-olive-deep);  /* Main brand color. Use it for active tab lines, progress bars, or checkbox checkmarks. */
     --accent-primary-subtle: var(--color-lime-soft);  /* Badges, selection states, highlighted containers */
@@ -129,7 +133,7 @@
     --accent-primary-ghost: var(--color-lime-tint);  /* Lightest lime surface. Used for hover backgrounds or very subtle selection highlights. */
     --accent-secondary-default: var(--color-mauve);  /* Raw secondary brand color. Use it for secondary feature blocks, illustrative accents, or secondary metric numbers on a dashboard. */
     --accent-secondary-subtle: var(--color-mauve-tint);  /* A very soft tint of your secondary color. Used for the background of specific feature cards, banners, or specialized category tags. */
-    --accent-secondary-strong: var(--color-mauve-deep);  /* Secondary brand-colored text. Used for specific category links, sub-headers, or highlighted keyword text. */
+    --accent-secondary-strong: var(--color-mauve-ink);  /* Accessible secondary text and border color. */
     --accent-tertiary-default: var(--color-rust);  /* A tertiary accent color. Use it for destructive actions, error states, or any time you want a strong contrast against both primary and secondary colors. */ 
     --accent-tertiary-ghost: var(--color-rust-tint);  /* A soft tint of your tertiary color. Used for error state backgrounds, destructive action hover states, or subtle highlights that still need to read as "dangerous". */
     --accent-tertiary-subtle: var(--color-coral-peach);  /* A softer, more approachable version of your tertiary color. Used for warning states, less severe destructive actions, or any time you want to convey caution without the full intensity of the default tertiary. */
@@ -139,6 +143,13 @@
     --feedback-warning: var(--color-orange);  /* Yellow/Orange — for alerts or pending states */
     --feedback-error: var(--color-rust);  /* Red — for system errors or destructive actions*/
     --feedback-info: var(--color-blue);  /* Blue — for informational messages or neutral actions */
+
+    /* Accessibility */
+    --focus-ring: var(--color-olive-accessible);
+    --link-text: var(--color-olive-accessible);
+    --status-success-text: var(--color-olive-accessible);
+    --status-error-text: var(--color-brown);
+    --overlay-scrim: rgba(51, 50, 43, 0.55);
 
     --shadow-content:
       0 4px   4px  0 rgba(0,0,0,0.251),

@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import styles from './HomeScreen.module.css';
-import logo from '../../assets/logo-desktop-on-light.svg';
+import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import QuizSelector from '../../components/QuizSelector';
 import ScreenLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
@@ -12,7 +12,11 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
 
   useEffect(() => {
     if (selectedTopic && buttonRef.current) {
-      buttonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      buttonRef.current.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
     }
   }, [selectedTopic]);
   return (
