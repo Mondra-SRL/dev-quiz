@@ -19,6 +19,7 @@ import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
 
 // module level constant for the timer countdown
 const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
+const MIN_LOADING_DISPLAY_MS = 1000;
 const LOAD_ERROR_MESSAGE =
   "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
@@ -60,6 +61,8 @@ function QuizScreen({
     const abortController = new AbortController(); // to cancel the request
 
     async function loadQuestions() {
+      const loadingStartedAt = Date.now();
+      
       setIsLoading(true);
       setError(null);
       setQuestions([]);
@@ -95,6 +98,19 @@ function QuizScreen({
           ...question,
           answers: shuffleArray(question.answers),
         }));
+
+      // keep the loading state visible long enough for users to notice it when
+      // the API fails quickly and local fallback questions load immediately.
+      const loadingTimeRemaining = Math.max(
+        MIN_LOADING_DISPLAY_MS - (Date.now() - loadingStartedAt),
+        0,
+      );
+
+      if (loadingTimeRemaining > 0) {
+        await new Promise((resolve) =>
+          window.setTimeout(resolve, loadingTimeRemaining),
+        );
+      }
 
       // The user may have left the screen while the short delay was running.
       if (abortController.signal.aborted) return;
