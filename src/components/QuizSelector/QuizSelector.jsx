@@ -1,5 +1,5 @@
 import styles from './QuizSelector.module.css';
-import checkedBadge from '../../assets/checked-badge.svg';
+import checkedBadge from '../../assets/svg/checked-badge.svg';
 
 function QuizSelector({ topics, selectedTopic, onSelectTopic }) {
   return (
