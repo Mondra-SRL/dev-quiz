@@ -1,11 +1,14 @@
+import arrowRightIconMerino from '../../assets/svg/arrow-right-icon-merino.svg';
+import arrowRightGray from '../../assets/svg/arrow-right-gray.svg';
 
-
-function ArrowRightIcon() {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-            <path fillRule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
-          </svg>
-    )
+function ArrowRightIcon({ disabled = false }) {
+  return (
+    <img
+      src={disabled ? arrowRightGray : arrowRightIconMerino}
+      alt=""
+      aria-hidden="true"
+    />
+  );
 }
 
 export default ArrowRightIcon;

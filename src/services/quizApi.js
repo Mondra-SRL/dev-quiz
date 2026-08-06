@@ -1,10 +1,7 @@
-// api to get fetch questions from quizapi.io 
-// module constants
+import { MIN_QUESTIONS } from "../config/quiz.js";
+import { getValidQuizQuestions } from "../utils/normalizeQuizQuestion.js";
 
-import { getValidQuizQuestions } from '../utils/normalizeQuizQuestion';
-
-const API_BASE_URL = '/api/quiz';
-export const MIN_QUESTIONS = 10;
+const API_BASE_URL = "/api/quiz";
 
 const buildUrl = (baseUrl, params) => {
   const search = new URLSearchParams(params).toString();
@@ -12,21 +9,25 @@ const buildUrl = (baseUrl, params) => {
 };
 
 const normalizeQuestion = (apiQuestion) => {
-  if (typeof apiQuestion?.text !== 'string' || apiQuestion.text.trim() === '') {
+  if (typeof apiQuestion?.text !== "string" || apiQuestion.text.trim() === "") {
     return null;
   }
 
-  const rawAnswers = Array.isArray(apiQuestion.answers) ? apiQuestion.answers : [];
+  const rawAnswers = Array.isArray(apiQuestion.answers)
+    ? apiQuestion.answers
+    : [];
 
   const answers = rawAnswers
     .map((answer) => answer?.text)
-    .filter((text) => typeof text === 'string' && text.trim() !== '');
+    .filter((text) => typeof text === "string" && text.trim() !== "");
 
-  const correctAnswers = rawAnswers.filter((answer) => answer?.isCorrect);
+  const correctAnswers = rawAnswers.filter(
+    (answer) => answer?.isCorrect === true,
+  );
 
   // Phase 3 - Validate values that are specific to the API response.
   if (answers.length !== rawAnswers.length || correctAnswers.length !== 1) {
-    return null; 
+    return null;
   }
 
   const explanation = apiQuestion.explanation;
@@ -42,12 +43,14 @@ const normalizeQuestion = (apiQuestion) => {
 
 export async function fetchQuizQuestions(topic, { signal } = {}) {
   if (!topic?.apiQuizId) {
-    throw new Error(`Missing apiQuizId for topic "${topic?.name ?? 'unknown'}".`);
+    throw new Error(
+      `Missing apiQuizId for topic "${topic?.name ?? "unknown"}".`,
+    );
   }
 
   const response = await fetch(
     buildUrl(API_BASE_URL, { quiz_id: topic.apiQuizId }),
-    { signal }
+    { signal },
   );
 
   if (!response.ok) {
@@ -57,16 +60,14 @@ export async function fetchQuizQuestions(topic, { signal } = {}) {
   const payload = await response.json();
   const apiQuestions = Array.isArray(payload?.data) ? payload.data : [];
 
-  // grab questions and normalize them 
-  const questions = getValidQuizQuestions(
-    apiQuestions
-      .map(normalizeQuestion)
-      .filter((question) => question !== null),
-  );
+  // keep invalid mapped values so the shared validator can reject the whole set.
+  const mappedQuestions = apiQuestions.map(normalizeQuestion);
+  const questions = getValidQuizQuestions(mappedQuestions);
 
-  // validate the questions array length 
-  if (questions.length < MIN_QUESTIONS){
-    throw new Error(`QuizAPI returned ${questions.length} usable questions for "${topic.name}", needs ${MIN_QUESTIONS}.`);
+  if (questions.length < MIN_QUESTIONS) {
+    throw new RangeError(
+      `Expected at least ${MIN_QUESTIONS} questions, but received ${questions.length}.`,
+    );
   }
 
   return questions;

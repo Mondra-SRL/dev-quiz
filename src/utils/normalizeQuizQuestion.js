@@ -45,9 +45,18 @@ export function normalizeQuizQuestion(question) {
 }
 
 export function getValidQuizQuestions(questions) {
-  if (!Array.isArray(questions)) return [];
+  // a quiz question set must always be an array.
+  if (!Array.isArray(questions)) {
+    throw new TypeError("Expected an array of questions.");
+  }
 
-  return questions
-    .map(normalizeQuizQuestion)
-    .filter((question) => question !== null);
+  // normalize every question into the format used by the app.
+  const normalizedQuestions = questions.map(normalizeQuizQuestion);
+
+  // reject the whole set if even one question is invalid.
+  if (normalizedQuestions.some((question) => question === null)) {
+    throw new Error("One or more questions are invalid.");
+  }
+
+  return normalizedQuestions;
 }

@@ -18,6 +18,13 @@ const validQuestion = {
   explanation: 'CSS stands for Cascading Style Sheets.',
 };
 
+const makeValidQuestions = (count = 10) =>
+  Array.from({ length: count }, (_, index) => ({
+    ...validQuestion,
+    id: `question-${index + 1}`,
+    answers: [...validQuestion.answers],
+  }));
+
 test('normalizes a complete quiz question', () => {
   assert.deepEqual(normalizeQuizQuestion(validQuestion), validQuestion);
 });
@@ -49,10 +56,59 @@ test('uses safe explanation copy when an explanation is missing', () => {
   );
 });
 
-test('filters invalid questions and handles non-array responses', () => {
-  assert.deepEqual(getValidQuizQuestions(null), []);
+test('returns a completely valid question array', () => {
+  const questions = makeValidQuestions(2);
+
+  assert.deepEqual(getValidQuizQuestions(questions), questions);
+});
+
+test('rejects non-array input', () => {
+  assert.throws(
+    () => getValidQuizQuestions(null),
+    /Expected an array of questions/,
+  );
+});
+
+test('rejects a 10-question array containing one invalid question', () => {
+  const questions = makeValidQuestions();
+  questions[4] = { ...questions[4], correctAnswer: 'Not in answers' };
+
+  assert.throws(
+    () => getValidQuizQuestions(questions),
+    /One or more questions are invalid/,
+  );
+});
+
+test('applies the default explanation to a question set', () => {
+  const questions = makeValidQuestions();
+  questions[0] = { ...questions[0], explanation: '' };
+
+  const normalizedQuestions = getValidQuizQuestions(questions);
+
+  assert.equal(
+    normalizedQuestions[0].explanation,
+    'No explanation available for this question.',
+  );
+});
+
+test('does not mutate the original question array', () => {
+  const questions = makeValidQuestions().map((question) => ({
+    ...question,
+    question: `  ${question.question}  `,
+    answers: question.answers.map((answer) => `  ${answer}  `),
+    correctAnswer: `  ${question.correctAnswer}  `,
+  }));
+  const originalQuestions = structuredClone(questions);
+
+  const normalizedQuestions = getValidQuizQuestions(questions);
+
+  assert.deepEqual(questions, originalQuestions);
+  assert.notStrictEqual(normalizedQuestions, questions);
+  assert.notStrictEqual(normalizedQuestions[0], questions[0]);
+  assert.notStrictEqual(normalizedQuestions[0].answers, questions[0].answers);
+  assert.equal(normalizedQuestions[0].question, validQuestion.question);
   assert.deepEqual(
-    getValidQuizQuestions([validQuestion, { ...validQuestion, id: null }]),
-    [validQuestion],
+    normalizedQuestions[0].answers,
+    validQuestion.answers,
   );
 });

@@ -84,7 +84,7 @@ Status key: Completed | In progress | Pending
 - Align the Results screen with completed and expired quiz outcomes.
 - Ensure the final results flow includes the intended quiz status handling.
 
-## Phase 14 - Global Timer [Pending]
+## Phase 14 - Global Timer
 
 - Implement the real countdown timer and timer progress bar.
 - Start the timer only after valid questions are ready.

@@ -9,8 +9,10 @@
 
 .question {
   width: 100%;
+  font-family: var(--font-question);
+  line-height: var(--lh-relaxed);
   text-align: left;
-  font-size: var(--fs-3xl);
+  font-size: var(--fs-2xl);
   margin: 0;
 }
 
@@ -19,11 +21,15 @@
   grid-template-columns: repeat(2, minmax(240px, 492px));
   justify-content: center;
   width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   gap: var(--space-4);
   align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   .question {
     text-align: center;
   }
