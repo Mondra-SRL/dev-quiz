@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MIN_QUESTIONS } from "../config/quiz.js";
+import { QUESTIONS_PER_QUIZ } from "../config/quiz.js";
 import { fetchQuizQuestions } from "./quizApi.js";
 
 const topic = {
@@ -29,28 +29,28 @@ const mockSuccessfulResponse = (testContext, questions) => {
 };
 
 test("rejects an API source with fewer than the minimum questions", async (t) => {
-  mockSuccessfulResponse(t, makeApiQuestions(MIN_QUESTIONS - 1));
+  mockSuccessfulResponse(t, makeApiQuestions(QUESTIONS_PER_QUIZ - 1));
 
   await assert.rejects(
     () => fetchQuizQuestions(topic),
     new RegExp(
-      `Expected at least ${MIN_QUESTIONS} questions, but received ${MIN_QUESTIONS - 1}`,
+      `Expected at least ${QUESTIONS_PER_QUIZ} questions, but received ${QUESTIONS_PER_QUIZ - 1}`,
     ),
   );
 });
 
 test("accepts an API source with the minimum number of questions", async (t) => {
-  mockSuccessfulResponse(t, makeApiQuestions(MIN_QUESTIONS));
+  mockSuccessfulResponse(t, makeApiQuestions(QUESTIONS_PER_QUIZ));
 
   const questions = await fetchQuizQuestions(topic);
 
-  assert.equal(questions.length, MIN_QUESTIONS);
+  assert.equal(questions.length, QUESTIONS_PER_QUIZ);
 });
 
 test("accepts an API source with more than the minimum questions", async (t) => {
-  mockSuccessfulResponse(t, makeApiQuestions(MIN_QUESTIONS + 1));
+  mockSuccessfulResponse(t, makeApiQuestions(QUESTIONS_PER_QUIZ + 1));
 
   const questions = await fetchQuizQuestions(topic);
 
-  assert.equal(questions.length, MIN_QUESTIONS + 1);
+  assert.equal(questions.length, QUESTIONS_PER_QUIZ + 1);
 });
