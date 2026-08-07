@@ -162,8 +162,8 @@ The current project state includes:
 * Question explanations, including a default fallback message when none is provided
 * Score tracking, final results, and retake or return-home actions
 * A direct exit-to-home action during the quiz
-* Timer UI placeholder only; countdown behavior is not implemented yet
-* Planned backend proxy work is not implemented yet
-
+* Timer countdown behavior 
+* Planned backend proxy work
+  
 For the complete scope, refer to the PRD.
 

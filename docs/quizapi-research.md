@@ -212,7 +212,7 @@ Nothing depends on the two sets matching. The app maps both into the same
 internal format, so the quiz screen cannot tell which source it received. What
 a fallback file must match is the contract, not the content:
 
-- exactly 10 questions
+- fallback files currently contain exactly 10 questions. At runtime, API and fallback sources are accepted when they contain at least MIN_QUESTIONS. The screen selects exactly QUESTIONS_PER_QUIZ questions.
 - the same internal format used for API questions
 - the same review criteria applied to pinned quizzes
 - comparable difficulty and tone, so a topic does not change character

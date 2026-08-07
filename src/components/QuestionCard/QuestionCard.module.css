@@ -21,6 +21,10 @@
   grid-template-columns: repeat(2, minmax(240px, 492px));
   justify-content: center;
   width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   gap: var(--space-4);
   align-items: start;
 }
