@@ -1,8 +1,10 @@
-# Quiz App
+# DevQuiz
 
 A programming quiz application built with React and Vite.
 
 Users select a programming topic, complete a quiz, receive immediate feedback, and view their final score.
+
+🔗 [Live demo](https://dev-quiz-roan.vercel.app/)
 
 ## Documentation
 
