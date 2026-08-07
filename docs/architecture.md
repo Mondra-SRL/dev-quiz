@@ -87,11 +87,8 @@ project-root/
 
 ### Configuration
 
-- `config/quiz.js`: Stores shared rules for the size of a valid question source and a quiz session.
-  - `MIN_QUESTIONS`: Minimum number of valid questions the API or fallback source must provide. A source with fewer questions is rejected.
-  - `QUESTIONS_PER_QUIZ`: Number of questions selected for one quiz session after the valid source questions are shuffled.
-
-Both values are currently `10`. They have separate names because the minimum source size and the number used in a session describe different responsibilities and may change independently in the future.
+- `config/quiz.js`: Stores shared quiz timing and question-count rules.
+  - `QUESTIONS_PER_QUIZ`: Number of questions required from a source and selected for one quiz session after the valid source questions are shuffled.
 
 ### Components
 
@@ -141,7 +138,7 @@ Each topic object contains the information required by the Home screen and Quiz 
 
 - `normalizeQuizQuestion.js`: Normalizes and validates questions that are already in the app's internal question format. This shared validation contract applies to fallback questions and to API questions after `quizApi.js` maps the raw API response into the internal shape.
 - `shuffleArray.js`: Randomizes question and answer order.
-- `getValidQuizQuestions()` requires an array, normalizes every question, and throws if any question is invalid. It never returns a partially valid question set. Source modules enforce `MIN_QUESTIONS` after normalization and validation.
+- `getValidQuizQuestions()` requires an array, normalizes every question, and throws if any question is invalid. It never returns a partially valid question set. Source modules require at least `QUESTIONS_PER_QUIZ` questions after normalization and validation.
 
 ### Root Files
 
@@ -353,7 +350,7 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 - Displays the quiz title or app title, timer, progress bar, question indicator, current question, answer options, feedback, explanation, Next Question button, Exit Quiz button, and exit modal
 - Receives `selectedTopic` from `App.jsx`
 - Resolves quiz questions for the selected topic
-- Uses QuizAPI as the primary source and falls back to bundled mock questions if the API is unavailable, errors, or returns an unusable question set, including invalid questions or fewer than `MIN_QUESTIONS`
+- Uses QuizAPI as the primary source and falls back to bundled mock questions if the API is unavailable, errors, or returns an unusable question set, including invalid questions or fewer than `QUESTIONS_PER_QUIZ`
 - Reports `totalQuestions` to `App.jsx`
 - Calls `incrementScore()` on each correct answer to update `score` in `App.jsx`
 - Updates `quizStatus` in `App.jsx` when the quiz is completed or expired
@@ -555,9 +552,8 @@ everything describing a topic stays in one place.
 The selected quiz ids and the criteria used to choose them are recorded in
 `docs/quizapi-research.md`.
 
-API and fallback sources must contain at least MIN_QUESTIONS valid questions.
-The UI selects exactly QUESTIONS_PER_QUIZ questions for each session.
-Both values are currently 10.
+API and fallback sources must contain at least `QUESTIONS_PER_QUIZ` valid questions.
+The UI selects exactly `QUESTIONS_PER_QUIZ` questions for each session.
 
 ### Request
 
@@ -656,7 +652,7 @@ Notes
 
 ### Question Randomization
 
-- A source must provide at least MIN_QUESTIONS valid questions. The complete valid set is shuffled, and the first QUESTIONS_PER_QUIZ questions are selected for the session.
+- A source must provide at least `QUESTIONS_PER_QUIZ` valid questions. The complete valid set is shuffled, and the first `QUESTIONS_PER_QUIZ` questions are selected for the session.
 - Questions are randomized once at quiz start
 - The randomized order stays fixed for that session
 - Once the session’s questions are selected, they are not removed, replaced, or reshuffled during that session
