@@ -1,25 +1,28 @@
-import { useEffect, useState, useRef } from 'react';
-import ScreenLayout from '../../components/ScreenLayout';
-import QuestionCard from '../../components/QuestionCard/QuestionCard';
-import FeedbackMessage from '../../components/FeedbackMessage/FeedbackMessage';
-import ExplanationBox from '../../components/ExplanationBox/ExplanationBox';
-import ExitQuizModal from '../../components/ExitQuizModal';
-import logo from '../../assets/svg/logo-desktop-on-light.svg';
-import styles from './QuizScreen.module.css';
-import TimerBar from '../../components/TimerBar';
-import clockIcon from '../../assets/svg/clock-icon.svg';
-import arrowRightIconMerino from '../../assets/svg/arrow-right-icon-merino.svg';
-import arrowRightGray from '../../assets/svg/arrow-right-gray.svg';
-import exitQuizIcon from '../../assets/svg/exit-quiz-icon.svg';
-import Button from '../../components/Button';
-import { fetchQuizQuestions, MIN_QUESTIONS } from '../../services/quizApi';
-import { getFallbackQuestions } from '../../data/fallbackQuestions'; 
-import { shuffleArray } from '../../utils/shuffleArray';
+import { useEffect, useState, useRef } from "react";
+import { Bars } from "react-loader-spinner";
+import ScreenLayout from "../../components/ScreenLayout";
+import QuestionCard from "../../components/QuestionCard/QuestionCard";
+import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
+import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
+import TimerBar from "../../components/TimerBar";
+import Button from "../../components/Button";
+import ArrowRightIcon from "../../components/ArrowRightIcon";
+import ExitQuizModal from "../../components/ExitQuizModal";
+import styles from "./QuizScreen.module.css";
+import logo from "../../assets/svg/logo-desktop-on-light.svg";
+import clockIcon from "../../assets/svg/clock-icon.svg";
+import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
+import { fetchQuizQuestions } from "../../services/quizApi";
+import { getFallbackQuestions } from "../../data/fallbackQuestions";
+import { shuffleArray } from "../../utils/shuffleArray";
+import {
+  QUESTIONS_PER_QUIZ,
+  MIN_LOADING_DISPLAY_MS,
+  QUIZ_DURATION_SECONDS,
+} from "../../config/quiz.js";
 
-// module level constant for questions per quiz
-const QUESTIONS_PER_QUIZ = MIN_QUESTIONS;
-// module level constant for the timer countdown
-const QUIZ_DURATION_SECONDS = 10 * 60; //10 minutes
+const LOAD_ERROR_MESSAGE =
+  "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
 // announce only useful countdown milestones so screen-reader users are not
 // interrupted by an update every second.
@@ -37,7 +40,7 @@ function QuizScreen({
   onSetTotalQuestions,
   onCancel,
   onFinish,
-  onIncrementScore
+  onIncrementScore,
 }) {
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,33 +62,59 @@ function QuizScreen({
     const abortController = new AbortController(); // to cancel the request
 
     async function loadQuestions() {
-      // variable to get resolvedQuestions
+      const loadingStartedAt = Date.now();
+      
+      setIsLoading(true);
+      setError(null);
+      setQuestions([]);
+      setSecondsRemaining(QUIZ_DURATION_SECONDS);
+      onSetTotalQuestions(0);
+
       let resolvedQuestions;
-      // try, catch and finally goes here with await
+
       try {
         resolvedQuestions = await fetchQuizQuestions(selectedTopic, {
           signal: abortController.signal,
         });
-      } catch (err) {
-        if (err.name === "AbortError") return; // our own cleanup , not a failure
-        // log the error
-        console.warn(err);
-        // fallback questions
-        const fallback = getFallbackQuestions(selectedTopic.id);
-        // validation for fallback questions
-        if (fallback.length < QUESTIONS_PER_QUIZ) {
-          setError(err.message);
+      } catch (apiError) {
+        // An aborted request is expected when the screen unmounts.
+        if (apiError.name === "AbortError") return;
+
+        console.warn(apiError);
+
+        try {
+          // The fallback module returns questions that are already validated.
+          resolvedQuestions = getFallbackQuestions(selectedTopic?.id);
+        } catch (fallbackError) {
+          console.warn(fallbackError);
+          setError(LOAD_ERROR_MESSAGE);
           setIsLoading(false);
           return;
         }
-        resolvedQuestions = fallback;
       }
+
       const sessionQuestions = shuffleArray(resolvedQuestions)
         .slice(0, QUESTIONS_PER_QUIZ)
         .map((question) => ({
           ...question,
           answers: shuffleArray(question.answers),
         }));
+
+      // keep the loading state visible long enough for users to notice it when
+      // the API fails quickly and local fallback questions load immediately.
+      const loadingTimeRemaining = Math.max(
+        MIN_LOADING_DISPLAY_MS - (Date.now() - loadingStartedAt),
+        0,
+      );
+
+      if (loadingTimeRemaining > 0) {
+        await new Promise((resolve) =>
+          window.setTimeout(resolve, loadingTimeRemaining),
+        );
+      }
+
+      // The user may have left the screen while the short delay was running.
+      if (abortController.signal.aborted) return;
 
       setQuestions(sessionQuestions);
       onSetTotalQuestions(sessionQuestions.length);
@@ -97,8 +126,8 @@ function QuizScreen({
     return () => abortController.abort();
   }, [selectedTopic, onSetTotalQuestions]);
 
-  // start the countdown once questions are ready. Clear the interval if
-  // readiness changes or QuizScreen unmounts.
+  // start the countdown once questions are ready.
+  // clear the interval if readiness changes or QuizScreen unmounts.
   useEffect(() => {
     const quizIsReady = !isLoading && !error && questions.length > 0;
 
@@ -148,8 +177,30 @@ function QuizScreen({
   if (isLoading) {
     return (
       <ScreenLayout>
-        <p>Loading...</p>
-        <Button onClick={onCancel}>Cancel</Button>
+        <section
+          className={styles.statusState}
+          role="status"
+          aria-live="polite"
+        >
+          <Bars
+            height="80"
+            width="80"
+            color="var(--color-olive-deep)"
+            ariaLabel="Loading quiz questions"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+          />
+          <div className={styles.statusCopy}>
+            <h1 className={styles.statusTitle}>Loading questions…</h1>
+            <p className={styles.statusMessage}>
+              We’re getting your quiz ready. This should only take a moment.
+            </p>
+          </div>
+          <Button variant="secondary" onClick={onCancel}>
+            Return Home
+          </Button>
+        </section>
       </ScreenLayout>
     );
   }
@@ -157,8 +208,16 @@ function QuizScreen({
   if (error) {
     return (
       <ScreenLayout>
-        <p>{error}</p>
-        <Button onClick={onCancel}>Cancel</Button>
+        <section className={styles.statusState} role="alert">
+          <div className={styles.statusCopy}>
+            <p className={styles.errorLabel}>Unable to start quiz</p>
+            <h1 className={styles.statusTitle}>Something went wrong</h1>
+            <p className={styles.statusMessage}>{error}</p>
+          </div>
+          <Button variant="primary" onClick={onCancel}>
+            Return Home
+          </Button>
+        </section>
       </ScreenLayout>
     );
   }
@@ -291,11 +350,7 @@ function QuizScreen({
           onClick={handleNextQuestion}
         >
           Next Question
-          <img
-            src={isValidated ? arrowRightIconMerino : arrowRightGray}
-            alt=""
-            aria-hidden="true"
-          />
+          <ArrowRightIcon disabled={!isValidated} />
         </Button>
       </div>
       </ScreenLayout>

@@ -62,3 +62,5 @@ flowchart TD
     AR --> B
     AS --> F
 ```
+
+For the component-level loading lifecycle, see the [QuizScreen loading flow](./quiz-screen-loading-flow.md).

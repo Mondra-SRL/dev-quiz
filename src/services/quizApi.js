@@ -1,7 +1,7 @@
-const API_BASE_URL = '/api/quiz';
-const explanationNotAvailable = "No explanation available for this question.";
-const ANSWERS_PER_QUESTION = 4;
-export const MIN_QUESTIONS = 10;
+import { MIN_QUESTIONS } from "../config/quiz.js";
+import { getValidQuizQuestions } from "../utils/normalizeQuizQuestion.js";
+
+const API_BASE_URL = "/api/quiz";
 
 const buildUrl = (baseUrl, params) => {
   const search = new URLSearchParams(params).toString();
@@ -9,24 +9,24 @@ const buildUrl = (baseUrl, params) => {
 };
 
 const normalizeQuestion = (apiQuestion) => {
-  if (typeof apiQuestion?.text !== 'string' || apiQuestion.text.trim() === '') {
+  if (typeof apiQuestion?.text !== "string" || apiQuestion.text.trim() === "") {
     return null;
   }
 
-  const rawAnswers = Array.isArray(apiQuestion.answers) ? apiQuestion.answers : [];
+  const rawAnswers = Array.isArray(apiQuestion.answers)
+    ? apiQuestion.answers
+    : [];
 
   const answers = rawAnswers
     .map((answer) => answer?.text)
-    .filter((text) => typeof text === 'string' && text.trim() !== '');
+    .filter((text) => typeof text === "string" && text.trim() !== "");
 
-  const correctAnswers = rawAnswers.filter((answer) => answer?.isCorrect);
+  const correctAnswers = rawAnswers.filter(
+    (answer) => answer?.isCorrect === true,
+  );
 
-  if (
-    answers.length !== ANSWERS_PER_QUESTION ||
-    answers.length !== rawAnswers.length ||
-    new Set(answers).size !== answers.length ||
-    correctAnswers.length !== 1
-  ) {
+  // Phase 3 - Validate values that are specific to the API response.
+  if (answers.length !== rawAnswers.length || correctAnswers.length !== 1) {
     return null;
   }
 
@@ -37,21 +37,20 @@ const normalizeQuestion = (apiQuestion) => {
     question: apiQuestion.text,
     answers,
     correctAnswer: correctAnswers[0].text,
-    explanation:
-      typeof explanation === 'string' && explanation.trim() !== ''
-        ? explanation
-        : explanationNotAvailable,
+    explanation,
   };
 };
 
 export async function fetchQuizQuestions(topic, { signal } = {}) {
   if (!topic?.apiQuizId) {
-    throw new Error(`Missing apiQuizId for topic "${topic?.name ?? 'unknown'}".`);
+    throw new Error(
+      `Missing apiQuizId for topic "${topic?.name ?? "unknown"}".`,
+    );
   }
 
   const response = await fetch(
     buildUrl(API_BASE_URL, { quiz_id: topic.apiQuizId }),
-    { signal }
+    { signal },
   );
 
   if (!response.ok) {
@@ -61,13 +60,13 @@ export async function fetchQuizQuestions(topic, { signal } = {}) {
   const payload = await response.json();
   const apiQuestions = Array.isArray(payload?.data) ? payload.data : [];
 
-  const questions = apiQuestions
-    .map(normalizeQuestion)
-    .filter((question) => question !== null);
+  // keep invalid mapped values so the shared validator can reject the whole set.
+  const mappedQuestions = apiQuestions.map(normalizeQuestion);
+  const questions = getValidQuizQuestions(mappedQuestions);
 
   if (questions.length < MIN_QUESTIONS) {
-    throw new Error(
-      `Quiz proxy returned ${questions.length} usable questions for "${topic.name}", needs ${MIN_QUESTIONS}.`
+    throw new RangeError(
+      `Expected at least ${MIN_QUESTIONS} questions, but received ${questions.length}.`,
     );
   }
 

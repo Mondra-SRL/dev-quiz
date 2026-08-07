@@ -40,6 +40,11 @@ project-root/
 |   `-- quiz.js
 |-- src/
 |   |-- assets/
+|   |   `-- fonts/
+|   |   `-- png/
+|   |   `-- svg/
+|   |-- config/
+|   |   `-- quiz.js
 |   |-- components/
 |   |   |-- AnswerOption/
 |   |   |-- Button/
@@ -68,6 +73,7 @@ project-root/
 |   |   |   `-- index.js
 |   |   `-- quizTopics.js
 |   |-- utils/
+|   |   |-- normalizeQuizQuestion.js
 |   |   `-- shuffleArray.js
 |   |-- styles/
 |   |   |-- globals.css
@@ -78,6 +84,14 @@ project-root/
 |-- .env.example
 `-- .gitignore
 ```
+
+### Configuration
+
+- `config/quiz.js`: Stores shared rules for the size of a valid question source and a quiz session.
+  - `MIN_QUESTIONS`: Minimum number of valid questions the API or fallback source must provide. A source with fewer questions is rejected.
+  - `QUESTIONS_PER_QUIZ`: Number of questions selected for one quiz session after the valid source questions are shuffled.
+
+Both values are currently `10`. They have separate names because the minimum source size and the number used in a session describe different responsibilities and may change independently in the future.
 
 ### Components
 
@@ -113,7 +127,7 @@ Each screen lives in its own folder (`ScreenName/`) containing the `.jsx` file, 
 ### Data
 
 - `quizTopics.js`: Stores the available quiz topics and their metadata.
-- `fallbackQuestions/`: Stores bundled fallback/mock questions in one file per topic, plus an `index.js` export for lookup by topic.
+- `fallbackQuestions/`: Stores bundled fallback/mock questions in one file per topic, plus an `index.js` export for lookup by topic. These files are authored in the app's internal question format.
 
 Each topic object contains the information required by the Home screen and Quiz screen, such as:
 
@@ -125,7 +139,9 @@ Each topic object contains the information required by the Home screen and Quiz 
 
 ### Utilities
 
+- `normalizeQuizQuestion.js`: Normalizes and validates questions that are already in the app's internal question format. This shared validation contract applies to fallback questions and to API questions after `quizApi.js` maps the raw API response into the internal shape.
 - `shuffleArray.js`: Randomizes question and answer order.
+- `getValidQuizQuestions()` requires an array, normalizes every question, and throws if any question is invalid. It never returns a partially valid question set. Source modules enforce `MIN_QUESTIONS` after normalization and validation.
 
 ### Root Files
 
@@ -205,7 +221,6 @@ Examples:
 
 These files are responsible for screen-level layout and positioning.
 
-
 ## CSS ORGANIZATION RULES
 
 - Keep global styles inside `globals.css`.
@@ -217,7 +232,6 @@ These files are responsible for screen-level layout and positioning.
 - Reuse CSS variables whenever possible instead of hardcoding values.
 - Use clear and consistent class names.
 - Keep styles modular and easy to maintain.
-
 
 ## DESIGN SYSTEM USAGE
 
@@ -309,6 +323,10 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 ### `isLoading`
 
 - Tracks question loading state while the app resolves either API data or fallback/mock questions
+- Keeps a successful loading state visible for at least `MIN_LOADING_DISPLAY_MS` (currently 1 second), preventing a brief loader flash when questions resolve immediately
+- Shows a Return Home action while questions are loading
+- Returning Home unmounts `QuizScreen.jsx`; the effect cleanup aborts the active API request so it cannot update the screen afterward
+- The global timer remains stopped until a ready question set is stored and `isLoading` becomes `false`
 
 ### `error`
 
@@ -335,7 +353,7 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 - Displays the quiz title or app title, timer, progress bar, question indicator, current question, answer options, feedback, explanation, Next Question button, Exit Quiz button, and exit modal
 - Receives `selectedTopic` from `App.jsx`
 - Resolves quiz questions for the selected topic
-- Uses QuizAPI as the primary source and falls back to bundled mock questions if the API is unavailable, errors, or returns no valid questions
+- Uses QuizAPI as the primary source and falls back to bundled mock questions if the API is unavailable, errors, or returns an unusable question set, including invalid questions or fewer than `MIN_QUESTIONS`
 - Reports `totalQuestions` to `App.jsx`
 - Calls `incrementScore()` on each correct answer to update `score` in `App.jsx`
 - Updates `quizStatus` in `App.jsx` when the quiz is completed or expired
@@ -358,7 +376,8 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 - `App.jsx` owns cross-screen state and navigation
 - `QuizScreen.jsx` owns in-progress quiz interaction state
 - Presentational components receive data and callbacks via props
-- `quizApi.js` communicates with the local backend proxy and formats API data before the UI uses it
+- `quizApi.js` communicates with the local backend proxy and maps raw API data into the app's internal question format before validation
+- The shared question normalization utility validates internal-format questions before they are used in a quiz session
 - The quiz session can continue with bundled fallback/mock questions if API data is unusable
 
 ### Flow Between Layers
@@ -373,6 +392,7 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 8. Quiz interactions update local quiz state; `QuizScreen.jsx` calls `incrementScore()` on each correct answer and updates `quizStatus` through the setter or callback passed down from `App.jsx`.
 9. `App.jsx` switches to `results` when the quiz finishes or expires.
 10. `ResultsScreen.jsx` reads final shared state and offers either reset navigation back to `home` or a retake action that starts a new quiz session for the same topic.
+
 ## QUIZ FLOW
 
 ### Session Start
@@ -381,11 +401,13 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 2. The user selects a topic and starts the quiz.
 3. `App.jsx` stores `selectedTopic` and switches `currentScreen` to `quiz`.
 4. `QuizScreen.jsx` requests questions for the selected topic.
-5. If QuizAPI returns valid questions, they are normalized and used for the session.
-6. If QuizAPI is unavailable, errors, or returns no valid questions, bundled fallback/mock questions are used instead.
-7. The resolved questions are randomized, stored in `questions`, and counted in `totalQuestions`.
-8. The global timer starts only after questions are ready.
-9. The first question appears with Next Question disabled.
+5. If QuizAPI returns valid questions, `quizApi.js` maps them into the internal question format and validates them.
+6. If QuizAPI is unavailable, errors, or returns no valid questions, bundled fallback/mock questions are loaded. Fallback questions are already authored in the internal format and are normalized/validated with the same shared rules before session use.
+7. While loading, the screen shows a loader and a Return Home action. Returning Home cancels the active API request through the loading effect's cleanup.
+8. The valid source questions are shuffled. QuizScreen.jsx selects 10 questions and shuffles their answer options.
+9. If necessary, the successful path waits until the minimum loading display time has elapsed before storing the session questions and reporting 10 as totalQuestions.
+10. `QuizScreen.jsx` sets `isLoading` to `false`, and the global timer starts only after the questions are ready.
+11. The first question appears with Next Question disabled.
 
 ### Answer Validation
 
@@ -533,6 +555,10 @@ everything describing a topic stays in one place.
 The selected quiz ids and the criteria used to choose them are recorded in
 `docs/quizapi-research.md`.
 
+API and fallback sources must contain at least MIN_QUESTIONS valid questions.
+The UI selects exactly QUESTIONS_PER_QUIZ questions for each session.
+Both values are currently 10.
+
 ### Request
 
 The frontend calls the local `/api/quiz` endpoint through `quizApi.js`.
@@ -540,10 +566,10 @@ The Vercel Function then requests `GET /questions` from QuizAPI and sends the AP
 
 Parameters sent on every request:
 
-| Parameter | Value | Purpose |
-| --- | --- | --- |
-| `quiz_id` | the topic's quiz id | Selects the reviewed quiz |
-| `include_answers` | `true` | Returns answer text and which answer is correct |
+| Parameter         | Value               | Purpose                                         |
+| ----------------- | ------------------- | ----------------------------------------------- |
+| `quiz_id`         | the topic's quiz id | Selects the reviewed quiz                       |
+| `include_answers` | `true`              | Returns answer text and which answer is correct |
 
 These are the only parameters the endpoint accepts when a quiz id is given.
 Category, difficulty, type, tag, and pagination parameters apply only when
@@ -602,11 +628,14 @@ Each question must include:
 - `correctAnswer`
 - `explanation`
 
+`explanation` may be missing or empty in source data. Normalization always adds a non-empty `explanation` to the internal question format.
+
 If a question has no explanation, show a fallback message such as:
 
 `No explanation available for this question.`
 
 The same explanation is shown whether the answer is correct or incorrect.
+
 ## ENVIRONMENT VARIABLES
 
 ### Required Variables
@@ -616,19 +645,21 @@ QUIZ_API_KEY=your_api_key_here
 ```
 
 Notes
+
 - `QUIZ_API_KEY` is read only by the Vercel Function and must not be exposed to frontend code.
 - This key must not use the `VITE_` prefix.
 - API keys should not be hardcoded in source files.
 - `.env` should be included in `.gitignore`.
 - `.env.example` should be committed to the repository.
+
 ## QUIZ LOGIC RULES
 
 ### Question Randomization
 
-- All questions returned for the selected topic are included in the session
+- A source must provide at least MIN_QUESTIONS valid questions. The complete valid set is shuffled, and the first QUESTIONS_PER_QUIZ questions are selected for the session.
 - Questions are randomized once at quiz start
 - The randomized order stays fixed for that session
-- Questions are not removed or replaced during the session
+- Once the session’s questions are selected, they are not removed, replaced, or reshuffled during that session
 - Fallback/mock questions follow the same session rules as API questions
 
 ### Answer Randomization
@@ -709,4 +740,4 @@ If no valid question source is available at all:
 - Next Question button disabled until answer validation
 - Questions randomized at quiz start
 - Answer options randomized before display
-- API logic separated from UI logic
+- API logic separated from UI logi
