@@ -1,7 +1,16 @@
+import { forwardRef } from 'react';
 import styles from './AnswerOption.module.css';
 import { InlineCodeText } from '../FormattedText';
 
-function AnswerOption({ letter, description, status, checked, onSelect, disabled }) {
+const AnswerOption = forwardRef(function AnswerOption({
+  letter,
+  description,
+  status,
+  checked,
+  onSelect,
+  disabled,
+  onKeyDown,
+}, ref) {
   const statusMessage = status === 'incorrect'
     ? 'Your answer, incorrect.'
     : status
@@ -11,12 +20,15 @@ function AnswerOption({ letter, description, status, checked, onSelect, disabled
 
   return (
     <button
+      ref={ref}
       type="button"
       className={styles.answerOption}
       data-state={status}
       onClick={onSelect}
+      onKeyDown={onKeyDown}
       disabled={disabled}
-      aria-pressed={checked}
+      role="radio"
+      aria-checked={checked}
     >
       <span className={styles.letter} aria-hidden="true">{letter}</span>
       <span className={styles.text}>
@@ -30,6 +42,6 @@ function AnswerOption({ letter, description, status, checked, onSelect, disabled
       )}
     </button>
   );
-}
+});
 
 export default AnswerOption;
