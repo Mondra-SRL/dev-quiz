@@ -7,19 +7,17 @@ function AnswerOption({ letter, description, status, checked, onSelect, disabled
     : status
       ? 'Correct answer.'
       : '';
-  const statusSymbol = status === 'incorrect' ? '×' : status ? '✓' : '';
+  const statusSymbol = status === 'incorrect' ? '\u00D7' : status ? '\u2713' : '';
 
   return (
-    <label className={styles.answerOption} data-state={status}>
-      <input
-        type="radio"
-        name="answer"
-        value={description}
-        checked={checked}
-        onChange={onSelect}
-        disabled={disabled}
-        className="visually-hidden"
-      />
+    <button
+      type="button"
+      className={styles.answerOption}
+      data-state={status}
+      onClick={onSelect}
+      disabled={disabled}
+      aria-pressed={checked}
+    >
       <span className={styles.letter} aria-hidden="true">{letter}</span>
       <span className={styles.text}>
         <InlineCodeText text={description} />
@@ -30,7 +28,7 @@ function AnswerOption({ letter, description, status, checked, onSelect, disabled
           {statusSymbol}
         </span>
       )}
-    </label>
+    </button>
   );
 }
 
