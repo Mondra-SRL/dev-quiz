@@ -16,8 +16,9 @@ import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
 import {
-  MIN_LOADING_DISPLAY_MS,
   QUESTIONS_PER_QUIZ,
+  MIN_LOADING_DISPLAY_MS,
+  QUIZ_DURATION_SECONDS,
 } from "../../config/quiz.js";
 
 const LOAD_ERROR_MESSAGE =
