@@ -32,6 +32,8 @@ All project dependencies should be installed and managed using npm.
 
 Alternative package managers (Yarn, pnpm, Bun, etc.) are currently out of scope unless the team agrees otherwise.
 
+Testing uses Node's built-in test runner via `npm test`.
+
 ## APP STRUCTURE
 
 ```txt
@@ -61,11 +63,13 @@ project-root/
 |   |   |-- QuizScreen/
 |   |   `-- ResultsScreen/
 |   |-- services/
-|   |   `-- quizApi.js
+|   |   |-- quizApi.js
+|   |   `-- quizApi.test.js
 |   |-- data/
 |   |   |-- fallbackQuestions/
 |   |   |   |-- css.js
 |   |   |   |-- html.js
+|   |   |   |-- index.test.js
 |   |   |   |-- javascript.js
 |   |   |   |-- python.js
 |   |   |   |-- react.js
@@ -74,6 +78,7 @@ project-root/
 |   |   `-- quizTopics.js
 |   |-- utils/
 |   |   |-- normalizeQuizQuestion.js
+|   |   |-- normalizeQuizQuestion.test.js
 |   |   `-- shuffleArray.js
 |   |-- styles/
 |   |   |-- globals.css
@@ -139,6 +144,16 @@ Each topic object contains the information required by the Home screen and Quiz 
 - `normalizeQuizQuestion.js`: Normalizes and validates questions that are already in the app's internal question format. This shared validation contract applies to fallback questions and to API questions after `quizApi.js` maps the raw API response into the internal shape.
 - `shuffleArray.js`: Randomizes question and answer order.
 - `getValidQuizQuestions()` requires an array, normalizes every question, and throws if any question is invalid. It never returns a partially valid question set. Source modules require at least `QUESTIONS_PER_QUIZ` questions after normalization and validation.
+
+## TESTING PURPOSE
+
+The current automated tests focus on protecting the quiz data contract rather than UI rendering. This is intentional because the app depends on a strict internal question shape before quiz state, answer validation, scoring, and timing can work reliably.
+
+- `src/utils/normalizeQuizQuestion.test.js` protects the shared normalization layer. It confirms valid questions pass, malformed questions are rejected, fallback explanation text is added when needed, and question arrays are validated without mutating source data.
+- `src/services/quizApi.test.js` protects the API service boundary. It confirms the frontend rejects QuizAPI responses that do not meet `MIN_QUESTIONS` and accepts responses that do, so the quiz never starts from an undersized API source.
+- `src/data/fallbackQuestions/index.test.js` protects bundled offline content. It confirms every supported topic has enough usable fallback questions and that unsupported topic lookups fail with clear errors.
+
+Together, these tests ensure both question sources, remote API data and bundled fallback data, satisfy the same validation rules before `QuizScreen.jsx` starts a session.
 
 ### Root Files
 
@@ -736,4 +751,4 @@ If no valid question source is available at all:
 - Next Question button disabled until answer validation
 - Questions randomized at quiz start
 - Answer options randomized before display
-- API logic separated from UI logi
+- API logic separated from UI logic
