@@ -1,45 +1,59 @@
+@layer components {
 .timerBar {
-  width: 100%;
-  height: 16px;
+  --_timer-height: 1rem;
+  --_timer-bg: var(--color-sand);
+
+  inline-size: 100%;
+  block-size: var(--_timer-height);
   border-radius: var(--radius-pill);
-  background: var(--surface-secondary);
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
-  position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--_timer-bg);
+  overflow: clip;
 }
-/* update the progress-bar*/
+/* Scale the fill instead of changing its inline size so countdown updates stay
+   on the compositor and do not trigger layout every second. */
 .fill {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, var(--accent-primary-subtle, rgba(198, 217, 126, 0.80)) 0%, var(--accent-primary-strong, rgba(92, 115, 39, 0.80)) 100%);
+  --_timer-fill-bg: linear-gradient(
+    90deg,
+    color-mix(
+      in srgb,
+      var(--accent-primary-subtle) 0%,
+      var(--accent-primary-strong)
+    ) 0%,
+    var(--accent-primary-strong) 100%
+  );
+
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--_timer-fill-bg);
   border-radius: var(--radius-pill);
   transform: scaleX(var(--timer-progress, 1));
   transform-origin: left center;
   transition: transform 1s linear;
 }
 
-@media (max-width: 48em) {
+@container screen (inline-size <= 48rem) {
   .timerBar {
-    height: 4px;
+    --_timer-height: var(--space-1);
   }
 }
 
 @media (prefers-contrast: more) {
   .timerBar {
-    border-width: var(--border-medium);
-    border-color: var(--text-primary);
+    --_timer-bg: var(--text-primary);
+  }
+
+  .fill {
+    --_timer-fill-bg: var(--surface-secondary);
   }
 }
 
 @media (forced-colors: active) {
   .timerBar {
-    background: Canvas;
-    border-color: CanvasText;
-    box-shadow: none;
+    --_timer-bg: CanvasText;
   }
 
   .fill {
-    background: Highlight;
+    --_timer-fill-bg: Highlight;
   }
+}
 }

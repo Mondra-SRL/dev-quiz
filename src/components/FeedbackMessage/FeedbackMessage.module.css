@@ -1,3 +1,4 @@
+@layer components {
 .feedbackMessage {
   display: flex;
   align-items: center;
@@ -9,19 +10,22 @@
 }
 
 .feedbackMessage .icon {
-  width: 18px;
-  height: 18px;
-}
-
-.feedbackMessage.correct {
-  color: var(--status-success-text);
-}
-
-.feedbackMessage.incorrect {
-  color: var(--status-error-text);
+  inline-size: 18px;
+  block-size: 18px;
 }
 
 .label {
   letter-spacing: var(--ls-widest);
   text-transform: uppercase;
+}
+
+/* The JSX data attribute is the single state contract; keeping state out of
+   class composition and inline custom properties avoids duplicate styling paths. */
+.feedbackMessage:where([data-feedback-state="correct"]) {
+  color: var(--status-success-text);
+}
+
+.feedbackMessage:where([data-feedback-state="incorrect"]) {
+  color: var(--status-error-text);
+}
 }
