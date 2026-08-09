@@ -57,6 +57,15 @@ export async function fetchQuizQuestions(topic, { signal } = {}) {
     throw new Error(`Quiz proxy request failed with status ${response.status}`);
   }
 
+  // A dev server without the proxy answers /api/quiz with a 200 carrying the
+  // handler's own source, so an ok status alone does not mean the body is JSON.
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    throw new TypeError(
+      `Expected JSON from the quiz proxy, but received "${contentType || "no content type"}".`,
+    );
+  }
+
   const payload = await response.json();
   const apiQuestions = Array.isArray(payload?.data) ? payload.data : [];
 
