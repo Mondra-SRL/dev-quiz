@@ -12,12 +12,12 @@ flowchart TD
     FETCH_API -- Response received --> MAP_API[Map API questions into the internal format]
     FETCH_API -- Request failed --> LOAD_FALLBACK
     MAP_API --> VALIDATE_API[Normalize and validate the complete API set]
-    VALIDATE_API --> API_READY{All API questions valid and<br/>at least MIN_QUESTIONS available?}
+    VALIDATE_API --> API_READY{All API questions valid and<br/>at least QUESTIONS_PER_QUIZ available?}
     API_READY -- Yes --> USE_API[Use API question set]
     API_READY -- No --> LOAD_FALLBACK[Load bundled fallback questions for selected topic]
 
     LOAD_FALLBACK --> VALIDATE_FALLBACK[Normalize and validate the complete fallback set]
-    VALIDATE_FALLBACK --> FALLBACK_READY{All fallback questions valid and<br/>at least MIN_QUESTIONS available?}
+    VALIDATE_FALLBACK --> FALLBACK_READY{All fallback questions valid and<br/>at least QUESTIONS_PER_QUIZ available?}
     FALLBACK_READY -- No --> LOAD_ERROR[Set error<br/>Set isLoading to false<br/>Allow user to return Home<br/>Do not start timer]
     FALLBACK_READY -- Yes --> USE_FALLBACK[Use fallback question set]
 

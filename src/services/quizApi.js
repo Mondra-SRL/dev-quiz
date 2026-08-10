@@ -1,4 +1,4 @@
-import { MIN_QUESTIONS } from "../config/quiz.js";
+import { QUESTIONS_PER_QUIZ } from "../config/quiz.js";
 import { getValidQuizQuestions } from "../utils/normalizeQuizQuestion.js";
 
 const API_BASE_URL = "/api/quiz";
@@ -64,9 +64,9 @@ export async function fetchQuizQuestions(topic, { signal } = {}) {
   const mappedQuestions = apiQuestions.map(normalizeQuestion);
   const questions = getValidQuizQuestions(mappedQuestions);
 
-  if (questions.length < MIN_QUESTIONS) {
+  if (questions.length < QUESTIONS_PER_QUIZ) {
     throw new RangeError(
-      `Expected at least ${MIN_QUESTIONS} questions, but received ${questions.length}.`,
+      `Expected at least ${QUESTIONS_PER_QUIZ} questions, but received ${questions.length}.`,
     );
   }
 

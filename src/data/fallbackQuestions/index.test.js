@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MIN_QUESTIONS } from "../../config/quiz.js";
+import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
 import { getFallbackQuestions } from "./index.js";
 
 const SUPPORTED_TOPICS = [
@@ -17,8 +17,8 @@ test("returns enough valid questions for every supported topic", () => {
     const questions = getFallbackQuestions(topicId);
 
     assert.ok(
-      questions.length >= MIN_QUESTIONS,
-      `${topicId} should have at least ${MIN_QUESTIONS} valid questions`,
+      questions.length >= QUESTIONS_PER_QUIZ,
+      `${topicId} should have at least ${QUESTIONS_PER_QUIZ} valid questions`,
     );
 
     questions.forEach((question) => {
