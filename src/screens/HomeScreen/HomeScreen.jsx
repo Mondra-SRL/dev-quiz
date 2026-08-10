@@ -35,7 +35,7 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
         onSelectTopic={onSelectTopic}
       />
 
-      <div ref={buttonRef} className={styles.startAction}>
+      <div ref={buttonRef}>
         <Button variant="primary" onClick={onStart} disabled={!selectedTopic}>
           Start Quiz <ArrowRightIcon disabled={!selectedTopic} />
         </Button>

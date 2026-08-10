@@ -1,80 +1,71 @@
-@layer components {
 .canvas {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  min-block-size: 100dvh;
+  min-height: 100dvh;
   padding: var(--space-10);
 }
 
-.card {  --_screen-card-padding: var(--space-10);
-  --_screen-card-bg: var(--surface-primary);
-  --_screen-card-radius: var(--radius-md);
-  --_screen-card-shadow:
-    0 4px 4px 0 color-mix(in srgb, var(--color-black) 25.1%, var(--color-transparent)),
-    0 18px 39px 0 color-mix(in srgb, var(--color-black) 5.1%, var(--color-transparent)),
-    0 71px 71px 0 color-mix(in srgb, var(--color-black) 3.9%, var(--color-transparent));
-  --_screen-card-overflow: clip;
-  --_screen-card-border: 0 solid var(--color-transparent);
-
+.card {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-7);
-  inline-size: 100%;
-  max-inline-size: 75rem;
+  width: 100%;
+  max-width: 1200px;
   /* Auto margins center cards that fit and collapse when cards overflow, keeping
      both the header and bottom actions inside the page's scrollable area. */
   margin-block: auto;
-  /* Descendants adapt to the space this reusable shell provides, not the viewport. */
-  container: screen / inline-size;
-  padding: var(--_screen-card-padding);
-  border: var(--_screen-card-border);
-  border-radius: var(--_screen-card-radius);
-  overflow: var(--_screen-card-overflow);
-  background: var(--_screen-card-bg);
-  box-shadow: var(--_screen-card-shadow);
+  padding: var(--space-10) var(--space-12);
+  background: var(--surface-primary);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 4px 4px 0 color-mix(in srgb, var(--color-black) 25.1%, var(--color-transparent)),
+    0 18px 39px 0 color-mix(in srgb, var(--color-black) 5.1%, var(--color-transparent)),
+    0 71px 71px 0 color-mix(in srgb, var(--color-black) 3.9%, var(--color-transparent));
+  overflow: clip;
 }
 
-.decorTopRight,
-.decorBottomLeft {
-  position: absolute;
-  inline-size: 3.125rem; /* 50px */
-  block-size: 3.125rem;
-  pointer-events: none; /* Decorative elements should not interfere with user interactions. */
+.card:focus-visible {
+  outline-offset: calc(-1 * var(--space-2));
 }
 
 .decorTopRight {
-  inset-block-start: 0;
-  inset-inline-end: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
 }
 
 .decorBottomLeft {
-  inset-block-end: 0;
-  inset-inline-start: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 50px;
 }
+
 @media (max-width: 48em) {
   .canvas {
     padding: 0;
   }
 
   .card {
-    --_screen-card-padding: var(--space-6);
-    --_screen-card-radius: 0;
-    --_screen-card-shadow: none;
-    --_screen-card-overflow: visible;
-
     margin-block: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
     /* Preserve the standard mobile spacing, then add the device safe area so
        content clears notches, rounded corners, and the home indicator. The
        fallback keeps the inset at zero on devices without a cutout. */
     padding-block:
-      calc(var(--_screen-card-padding) + env(safe-area-inset-top, 0px))
-      calc(var(--_screen-card-padding) + env(safe-area-inset-bottom, 0px));
+      calc(var(--space-6) + env(safe-area-inset-top, 0px))
+      calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
     padding-inline:
-      calc(var(--_screen-card-padding) + env(safe-area-inset-left, 0px))
-      calc(var(--_screen-card-padding) + env(safe-area-inset-right, 0px));
+      calc(var(--space-6) + env(safe-area-inset-left, 0px))
+      calc(var(--space-6) + env(safe-area-inset-right, 0px));
   }
 
   .decorTopRight,
@@ -85,17 +76,15 @@
 
 @media (prefers-contrast: more) {
   .card {
-    --_screen-card-border: var(--border-medium) solid var(--text-primary);
+    border: var(--border-medium) solid var(--text-primary);
   }
 }
 
 @media (forced-colors: active) {
   .card {
-    --_screen-card-bg: Canvas;
-    --_screen-card-border: var(--border-hairline) solid CanvasText;
-    --_screen-card-shadow: none;
-
     color: CanvasText;
+    background: Canvas;
+    border: var(--border-hairline) solid CanvasText;
+    box-shadow: none;
   }
-}
 }

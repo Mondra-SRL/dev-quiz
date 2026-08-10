@@ -1,36 +1,22 @@
-@layer components {
 .answerOption {
-  --_answer-bg: var(--surface-primary);
-  --_answer-color: var(--text-primary);
-  --_answer-border-color: var(--border-subtle);
-  --_answer-border-width: var(--border-hairline);
-  --_answer-border-start-width: var(--_answer-border-width);
-  --_answer-cursor: pointer;
-  --_letter-bg: var(--color-sand);
-  --_letter-color: inherit;
-  --_letter-border-color: var(--border-subtle);
-  --_letter-border-width: var(--border-thin);
-  --_status-indicator-size: 1.75rem;
-
   display: flex;
   align-items: center;
   gap: var(--space-4); /* 16px */
-  inline-size: 100%;
+  width: 100%;
+  height: 78px;
   padding: var(--space-4);
   border-radius: var(--radius-xl);
-  border: var(--_answer-border-width) solid var(--_answer-border-color);
-  border-inline-start-width: var(--_answer-border-start-width);
-  background: var(--_answer-bg);
-  color: var(--_answer-color);
-  text-align: start;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  text-align: left;
   box-sizing: border-box;
-  cursor: var(--_answer-cursor);
+  cursor: pointer;
 }
 
 .answerOption:has(input:not(:disabled)):hover {
-  --_answer-bg: var(--surface-hover);
-  --_answer-border-color: var(--text-secondary);
-
+  background-color: var(--surface-hover);
+  border-color: var(--text-secondary);
   box-shadow: inset 0 0 0 var(--border-hairline) var(--text-secondary);
 }
 
@@ -40,53 +26,53 @@
 }
 
 .answerOption:has(input:disabled) {
-  --_answer-cursor: not-allowed;
+  cursor: not-allowed;
 }
 
-/* Badge letters use primary text because the status hues do not reach 4.5:1
-   against their subtle surfaces. :where() keeps state specificity flat. */
-.answerOption:where([data-state="correct"]),
-.answerOption:where([data-state="reveal"]) {
-  --_answer-bg: var(--color-lime-tint);
-  --_answer-color: var(--status-success-text);
-  --_answer-border-color: var(--border-green);
-  --_answer-border-start-width: var(--border-thick);
-  --_letter-bg: var(--accent-primary-subtle);
-  --_letter-color: var(--text-primary);
-  --_letter-border-color: var(--border-green);
+.answerOption[data-state="correct"],
+.answerOption[data-state="reveal"] {
+  background: var(--accent-primary-ghost);
+  color: var(--status-success-text);
+  border-color: var(--border-green);
+  border-inline-start-width: var(--border-thick);
 }
 
-.answerOption:where([data-state="incorrect"]) {
-  --_answer-bg: var(--color-rust-tint);
-  --_answer-color: var(--accent-tertiary-strong);
-  --_answer-border-color: var(--border-red);
-  --_answer-border-start-width: var(--border-thick);
-  --_letter-bg: var(--color-coral-peach);
-  --_letter-color: var(--text-primary);
-  --_letter-border-color: var(--border-red);
+.answerOption[data-state="incorrect"] {
+  background: var(--accent-tertiary-ghost);
+  color: var(--accent-tertiary-strong);
+  border-color: var(--border-red);
+  border-inline-start-width: var(--border-thick);
 }
 
-/* Fixed indicators keep their shape while the flexible text item is allowed to
-   shrink below its min-content size and wrap long code tokens. */
 .letter {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
-  background: var(--_letter-bg);
-  color: var(--_letter-color);
+  background: var(--surface-primary);
   font-weight: var(--fw-bold);
-  border: var(--_letter-border-width) solid var(--_letter-border-color);
+  border: var(--border-thin) solid var(--border-subtle);
+  background-color: var(--color-sand);
+}
+
+.answerOption[data-state="correct"] .letter,
+.answerOption[data-state="reveal"] .letter {
+  background: var(--accent-primary-subtle);
+  border-color: var(--border-green);
+  color: var(--status-success-text);
+}
+
+.answerOption[data-state="incorrect"] .letter {
+  background: var(--accent-tertiary-subtle);
+  border-color: var(--border-red);
+  color: var(--accent-tertiary-strong);
 }
 
 .text {
   display: block;
   flex: 1;
-  min-inline-size: 0;
-  overflow-wrap: anywhere;
 }
 
 .statusIndicator {
@@ -94,8 +80,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  inline-size: var(--_status-indicator-size);
-  block-size: var(--_status-indicator-size);
+  width: 28px;
+  height: 28px;
   font-size: var(--fs-xl);
   font-weight: var(--fw-bold);
   line-height: 1;
@@ -104,29 +90,22 @@
 }
 
 @media (prefers-contrast: more) {
-  .answerOption {
-    --_answer-border-width: var(--border-medium);
-    --_letter-border-width: var(--border-medium);
+  .answerOption,
+  .letter {
+    border-width: var(--border-medium);
   }
 }
 
 @media (forced-colors: active) {
-  .answerOption {
-    --_answer-bg: Canvas;
-    --_answer-color: CanvasText;
-    --_answer-border-color: CanvasText;
-    --_letter-bg: Canvas;
-    --_letter-color: CanvasText;
-    --_letter-border-color: CanvasText;
-  }
-
+  .answerOption,
+  .letter,
   .statusIndicator {
     color: CanvasText;
+    background: Canvas;
     border-color: CanvasText;
   }
 
   .answerOption:focus-visible {
     outline-color: Highlight;
   }
-}
 }

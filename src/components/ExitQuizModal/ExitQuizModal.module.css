@@ -1,43 +1,22 @@
-@layer components {
 .backdrop {
-  --_backdrop-bg: color-mix(
-    in srgb,
-    var(--color-charcoal) 55%,
-    var(--color-transparent)
-  );
-
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  /* Keep the dialog reachable on short or zoomed viewports without scrolling
-     the inert page behind it. */
-  overflow-block: auto;
-  overscroll-behavior: contain;
-  background: var(--_backdrop-bg);
+  background: var(--overlay-scrim);
 }
 
 .exitQuizModal {
-  --_modal-color: var(--text-primary);
-  --_modal-bg: var(--bg-canvas);
-  --_modal-border: 0 solid var(--color-transparent);
-
   display: flex;
   align-items: center;
   justify-content: center;
-  inline-size: min(25rem, 100%);
-  /* Leave the backdrop padding visible and scroll tall dialog content instead
-     of clipping its message or actions. */
-  max-block-size: calc(100dvh - var(--space-7));
-  padding-block: var(--space-6);
-  padding-inline: var(--space-4);
-  overflow-block: auto;
-  overflow-inline: hidden;
-  color: var(--_modal-color);
-  background: var(--_modal-bg);
-  border: var(--_modal-border);
+  width: min(394px, 100%);
+  padding: var(--space-6) var(--space-4);
+  overflow: hidden;
+  color: var(--text-primary);
+  background: var(--bg-canvas);
   border-radius: var(--radius-xl);
 }
 
@@ -46,22 +25,22 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-8);
-  inline-size: 100%;
+  width: 100%;
 }
 
 .logoWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  inline-size: 100%;
-  block-size: 44px;
+  width: 100%;
+  height: 44px;
   padding: 10px;
 }
 
 .logo {
   flex-shrink: 0;
-  inline-size: 193px;
-  block-size: 36px;
+  width: 193px;
+  height: 36px;
 }
 
 .modalMessage {
@@ -69,14 +48,14 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
-  inline-size: 100%;
+  width: 100%;
   color: var(--text-primary);
   text-align: center;
   overflow-wrap: anywhere;
 }
 
 .modalMessage h2 {
-  inline-size: 100%;
+  width: 100%;
   font-family: var(--font-display);
   font-size: var(--fs-2xl);
   font-weight: var(--fw-semibold);
@@ -87,7 +66,7 @@
 }
 
 .modalMessage p {
-  inline-size: 100%;
+  width: 100%;
   font-family: var(--font-ui);
   font-size: var(--fs-lg);
   font-weight: var(--fw-regular);
@@ -96,42 +75,45 @@
 }
 
 .buttons {
-  display: grid;
-  /* Intrinsic fractional rows take the taller button's content size, keeping
-     both actions equal while allowing text scaling and wrapping to add height. */
-  grid-auto-rows: 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--space-3);
-  inline-size: 100%;
+  width: 100%;
 }
 
-.modalButton {
-  inline-size: 100%;
-  min-block-size: 3rem;
-  padding-block: var(--space-4);
-  padding-inline: var(--space-7);
+.buttons > button {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-4) var(--space-7);
+  border: var(--border-medium) solid transparent;
+}
+
+.buttons > button:last-child {
+  border-width: var(--border-medium);
+  border-color: var(--accent-secondary-strong);
 }
 
 .buttons img {
   flex-shrink: 0;
-  inline-size: 8px;
-  block-size: 12px;
+  width: 8px;
+  height: 12px;
 }
 
 @media (prefers-contrast: more) {
   .exitQuizModal {
-    --_modal-border: var(--border-medium) solid var(--text-primary);
+    border: var(--border-medium) solid var(--text-primary);
   }
 }
 
 @media (forced-colors: active) {
   .backdrop {
-    --_backdrop-bg: Canvas;
+    background: Canvas;
   }
 
   .exitQuizModal {
-    --_modal-bg: Canvas;
-    --_modal-border: var(--border-hairline) solid CanvasText;
-    --_modal-color: CanvasText;
+    color: CanvasText;
+    background: Canvas;
+    border-color: CanvasText;
   }
-}
 }

@@ -1,25 +1,19 @@
-@layer components {
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: var(--space-6);
-  inline-size: 100%;
-  max-inline-size: 1050px;
+  width: 100%;
+  max-width: 1050px;
 }
 
 .card {
-  --_card-bg: var(--surface-secondary);
-  --_card-border-color: var(--border-subtle);
-  --_card-border-width: var(--border-thin);
-  --_card-name-color: var(--text-primary);
-
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-6);
   padding: var(--space-6) var(--space-7);
-  background: var(--_card-bg);
-  border: var(--_card-border-width) solid var(--_card-border-color);
+  background: var(--surface-secondary);
+  border: var(--border-thin) solid var(--border-subtle);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease;
@@ -27,18 +21,16 @@
 
 @media (hover: hover) {
   .card:hover:not(:has(:checked)) {
-    --_card-bg: var(--surface-hover);
-    --_card-border-color: var(--text-secondary);
-
+    background: var(--surface-hover);
+    border-color: var(--text-secondary);
     box-shadow: inset 0 0 0 var(--border-hairline) var(--text-secondary);
   }
 }
 
 .card:has(:checked) {
-  --_card-bg: var(--accent-secondary-subtle);
-  --_card-border-color: var(--accent-secondary-strong);
-  --_card-border-width: var(--border-thick);
-  --_card-name-color: var(--accent-secondary-strong);
+  background: var(--accent-secondary-subtle);
+  border-color: var(--accent-secondary-strong);
+  border-width: var(--border-thick);
 }
 
 .card:has(input:focus-visible) {
@@ -47,32 +39,30 @@
 }
 
 .icon {
-  inline-size: 56px;
-  block-size: 56px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   flex-shrink: 0;
 }
 
-/* Flex items otherwise retain their min-content width; the logical end padding
-   also keeps wrapped names clear of the absolutely positioned selected badge. */
 .name {
-  flex: 1;
-  min-inline-size: 0;
-  padding-inline-end: var(--space-2);
-  overflow-wrap: anywhere;
-  color: var(--_card-name-color);
   font-family: var(--font-ui);
-  font-size: var(--fs-base);
   font-weight: var(--fw-bold);
+  font-size: var(--fs-base);
   line-height: var(--lh-tight);
+  color: var(--text-primary);
+}
+
+.card:has(:checked) .name {
+  color: var(--accent-secondary-strong);
 }
 
 .badge {
   position: absolute;
-  inset-block-start: 12px;
-  inset-inline-end: 12px;
-  inline-size: 24px;
-  block-size: 24px;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
   display: none;
 }
 
@@ -82,22 +72,19 @@
 
 @media (prefers-contrast: more) {
   .card {
-    --_card-border-width: var(--border-medium);
+    border-width: var(--border-medium);
   }
 }
 
 @media (forced-colors: active) {
   .card,
   .card:has(:checked) {
-    --_card-bg: Canvas;
-    --_card-border-color: CanvasText;
-    --_card-name-color: CanvasText;
-
     color: CanvasText;
+    background: Canvas;
+    border-color: CanvasText;
   }
 
   .card:has(input:focus-visible) {
     outline-color: Highlight;
   }
-}
 }
