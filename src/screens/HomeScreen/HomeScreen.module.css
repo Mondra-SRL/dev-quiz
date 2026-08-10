@@ -1,32 +1,41 @@
-.header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-7);
-  width: 100%;
-}
-
-.logo {
-  height: 44px;
-  width: auto;
-
-  @media (max-width: 48em) {
-    height: 36px;
-    width: auto;
-  }
-}
-
+@layer components {
+.header,
 .headerCopy {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-5);
-  text-align: center;
-  width: 100%;
+  inline-size: 100%;
+  /* Nested flex items must be allowed to shrink below their min-content size. */
+  min-inline-size: 0;
 }
 
-@media (max-width: 48em) {
-  button {
-    width: 100%;
+.header {
+  gap: var(--space-7);
+}
+
+.headerCopy {
+  gap: var(--space-5);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.logo {
+  block-size: 2.75rem;
+  inline-size: auto;
+}
+
+.startAction {
+  display: flex;
+  justify-content: center;
+}
+
+@container screen (inline-size <= 48rem) {
+  .logo {
+    block-size: 2.25rem;
   }
+
+  .startAction {
+    inline-size: 100%;
+  }
+}
 }

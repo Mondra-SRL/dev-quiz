@@ -1,12 +1,30 @@
+@layer components {
+.quizContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  inline-size: 100%;
+  max-inline-size: 62.5rem;
+  min-inline-size: 0;
+}
+
 .statusState {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-7);
-  width: 100%;
-  min-height: clamp(24rem, 55vh, 36rem);
+  inline-size: 100%;
+  min-block-size: clamp(24rem, 55dvh, 36rem);
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The third-party loader uses SVG SMIL, which the global CSS animation reset
+     cannot pause; the adjacent live status text still communicates loading. */
+  .loadingIndicator {
+    display: none;
+  }
 }
 
 .statusCopy {
@@ -14,11 +32,11 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-5);
-  width: 100%;
+  inline-size: 100%;
 }
 
 .statusMessage {
-  max-width: 48rem;
+  max-inline-size: 48rem;
   color: var(--text-secondary);
   font-size: var(--fs-lg);
   line-height: var(--lh-relaxed);
@@ -40,7 +58,7 @@
 }
 
 .header {
-  width: 100%;
+  inline-size: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
@@ -53,8 +71,8 @@
 }
 
 .logo {
-  height: 36px;
-  width: auto;
+  block-size: 2.25rem;
+  inline-size: auto;
 }
 
 .timerMeta {
@@ -64,8 +82,8 @@
 }
 
 .clockIcon {
-  width: 20px;
-  height: auto;
+  inline-size: 1.25rem;
+  block-size: auto;
 }
 
 .timerText {
@@ -75,7 +93,7 @@
 }
 
 .timerRow {
-  width: 100%;
+  inline-size: 100%;
 }
 
 .rowSecondary {
@@ -86,8 +104,8 @@
 
 .exitQuizIcon {
   flex-shrink: 0;
-  width: 10px;
-  height: 10px;
+  inline-size: 0.625rem;
+  block-size: 0.625rem;
 }
 
 .questionCounter {
@@ -98,22 +116,25 @@
   color: var(--text-tertiary);
 }
 
+/* Keep the artwork stable while allowing topic copy to shrink and wrap. */
 .topicSummary {
   display: flex;
   align-items: center;
   gap: var(--space-4);
+  min-inline-size: 0;
 }
 
 .topicIcon {
-  width: 56px;
-  height: 56px;
+  flex-shrink: 0;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
   background: var(--surface-secondary);
   object-fit: cover;
 }
 
 .topicText {
-  display: flex;
-  gap: var(--space-1);
+  flex: 1;
+  min-inline-size: 0;
 }
 
 .topicName {
@@ -122,73 +143,59 @@
   color: var(--text-tertiary);
 }
 
+.topicDescription {
+  color: var(--text-tertiary);
+  overflow-wrap: anywhere;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-normal);
+}
+
 .feedbackSection {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.topicDescription {
-  font-size: var(--fs-base);
-  color: var(--text-tertiary);
-  font-weight: var(--fw-regular);
-  letter-spacing: var(--ls-tight);
-  line-height: var(--lh-normal);
+.nextAction {
+  display: flex;
+  justify-content: center;
+  inline-size: 100%;
 }
 
-@media (max-width: 48em) {
+@container screen (inline-size <= 48rem) {
   .header {
     gap: var(--space-4);
   }
 
   .rowTop {
-    justify-content: space-between;
-    align-items: center;
     gap: var(--space-4);
   }
 
   .logo {
-    height: 32px;
-    width: auto;
-  }
-
-  .timerMeta {
-    width: auto;
-    gap: var(--space-2);
-  }
-
-  .timerRow {
-    width: 100%;
+    block-size: 2rem;
   }
 
   .rowSecondary {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
     gap: var(--space-4);
-    width: 100%;
+    inline-size: 100%;
   }
 
   .questionCounter {
     font-size: var(--fs-base);
-    letter-spacing: var(--ls-normal);
   }
 
   .topicSummary {
-    width: 100%;
+    inline-size: 100%;
     align-items: flex-start;
     gap: var(--space-3);
-    margin: var(--space-3) 0;
+    margin-block: var(--space-3);
   }
 
   .topicIcon {
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-  }
-
-  .topicText {
-    gap: var(--space-2);
+    inline-size: 3rem;
+    block-size: 3rem;
   }
 
   .topicName {
@@ -197,7 +204,6 @@
 
   .topicDescription {
     font-size: var(--fs-sm);
-    line-height: var(--lh-normal);
   }
 
   .statusTitle {
@@ -207,4 +213,5 @@
   .statusMessage {
     font-size: var(--fs-base);
   }
+}
 }

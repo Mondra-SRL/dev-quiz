@@ -187,14 +187,12 @@ function QuizScreen({
             width="80"
             color="var(--color-olive-deep)"
             ariaLabel="Loading quiz questions"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
+            wrapperClass={styles.loadingIndicator}
           />
           <div className={styles.statusCopy}>
             <h1 className={styles.statusTitle}>Loading questions…</h1>
             <p className={styles.statusMessage}>
-              We’re getting your quiz ready. This should only take a moment.
+              We’re getting your quiz ready.
             </p>
           </div>
           <Button variant="secondary" onClick={onCancel}>
@@ -269,72 +267,74 @@ function QuizScreen({
   return (
     <>
       <ScreenLayout inert={isExitModalOpen}>
-      <header className={styles.header}>
-        <div className={styles.rowTop}>
-          <img src={logo} alt="devquiz" className={styles.logo} />
-          <div className={styles.timerMeta}>
-            <img
-              src={clockIcon}
-              alt=""
-              aria-hidden="true"
-              className={styles.clockIcon}
-            />
-            <p className={styles.timerText}>{formattedTime}</p>
-            <p
-              className="visually-hidden"
-              aria-live="polite"
-              aria-atomic="true"
+      <div className={styles.quizContent}>
+        <header className={styles.header}>
+          <div className={styles.rowTop}>
+            <img src={logo} alt="devquiz" className={styles.logo} />
+            <div className={styles.timerMeta}>
+              <img
+                src={clockIcon}
+                alt=""
+                aria-hidden="true"
+                className={styles.clockIcon}
+              />
+              <p className={styles.timerText}>{formattedTime}</p>
+              <p
+                className="visually-hidden"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {timerAnnouncement}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.timerRow}>
+            <TimerBar percentage={progressPercentage} />
+          </div>
+
+          <div className={styles.rowSecondary}>
+            <p className={styles.questionCounter}>
+              Question {currentQuestionIndex + 1} of {totalQuestions}
+            </p>
+            <Button
+              ref={exitButtonRef}
+              variant="tertiary"
+              onClick={handleOpenExitModal}
             >
-              {timerAnnouncement}
-            </p>
+              EXIT QUIZ
+              <img
+                src={exitQuizIcon}
+                className={styles.exitQuizIcon}
+                alt=""
+                aria-hidden="true"
+              />
+            </Button>
           </div>
-        </div>
 
-        <div className={styles.timerRow}>
-          <TimerBar percentage={progressPercentage} />
-        </div>
-
-        <div className={styles.rowSecondary}>
-          <p className={styles.questionCounter}>
-            Question {currentQuestionIndex + 1} of {totalQuestions}
-          </p>
-          <Button
-            ref={exitButtonRef}
-            variant="tertiary"
-            onClick={handleOpenExitModal}
-          >
-            EXIT QUIZ
+          <div className={styles.topicSummary}>
             <img
-              src={exitQuizIcon}
-              className={styles.exitQuizIcon}
+              src={selectedTopic.image}
               alt=""
               aria-hidden="true"
+              className={styles.topicIcon}
             />
-          </Button>
-        </div>
-
-        <div className={styles.topicSummary}>
-          <img
-            src={selectedTopic.image}
-            alt=""
-            aria-hidden="true"
-            className={styles.topicIcon}
-          />
-          <div className={styles.topicText}>
-            <p className={styles.topicDescription}>
-              <span className={styles.topicName}>{selectedTopic.name}</span>{" "}
-              &gt; {selectedTopic.description}
-            </p>
+            <div className={styles.topicText}>
+              <p className={styles.topicDescription}>
+                <span className={styles.topicName}>{selectedTopic.name}</span>{" "}
+                &gt; {selectedTopic.description}
+              </p>
+            </div>
           </div>
-        </div>
-      </header>
-      <QuestionCard
-        question={currentQuestion.question}
-        answers={currentQuestion.answers}
-        correctAnswer={currentQuestion.correctAnswer}
-        selectedAnswer={selectedAnswer}
-        onSelectAnswer={handleAnswerSelect}
-      />
+        </header>
+        <QuestionCard
+          question={currentQuestion.question}
+          answers={currentQuestion.answers}
+          correctAnswer={currentQuestion.correctAnswer}
+          selectedAnswer={selectedAnswer}
+          onSelectAnswer={handleAnswerSelect}
+        />
+      </div>
       {isValidated && (
         <div className={styles.feedbackSection}>
           <FeedbackMessage
@@ -343,7 +343,7 @@ function QuizScreen({
           <ExplanationBox explanation={currentQuestion.explanation} />
         </div>
       )}
-      <div ref={nextButtonRef}>
+      <div ref={nextButtonRef} className={styles.nextAction}>
         <Button
           variant="primary"
           disabled={!isValidated}

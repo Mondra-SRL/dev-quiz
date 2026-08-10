@@ -1,47 +1,45 @@
-/* Desktop - Results Screen */ 
-
-.header {
-    display: flex; 
-    align-items: center; /* Center children vertically */
-    width: 100%; /* Full width of the parent */
-
-    /* mobile styling for header */ 
-    @media (max-width: 48em){
-        flex-direction: column; /* Stack children vertically on smaller screens */
-    }
+@layer components {
+.header,
+.quizContent,
+.actions {
+  inline-size: 100%;
 }
 
-.logo{
-    height: 44px; 
-    width: auto; /* Maintain aspect ratio */
+.header {
+  display: flex;
+  align-items: center;
+}
 
-    /* mobile styles */
-    @media (max-width: 48em){
-        height: 36px; /* Reduce height for smaller screens */
-    }
+.logo {
+  inline-size: auto;
+  block-size: 2.75rem;
 }
 
 .quizContent {
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: var(--space-7); /* 32px gap between children */
-    width: 100%; /* Full width of the parent */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-7);
 }
 
 .headerTitle {
-    text-align: center; /* Center the text */
+  text-align: center;
 }
 
-/* actions styling */
 .actions {
-    display: flex;
-    flex-direction: row; /* Side by side on desktop */
-    gap: var(--space-4); /* 16px gap between children */
-    width: 100%; /* Full width of the parent */
-    justify-content: center; /* Center children horizontally */
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+}
 
-    @media (max-width: 48em){
-        flex-direction: column; /* Stack children vertically on smaller screens */
-    }
+@container screen (inline-size <= 48rem) {
+  .header,
+  .actions {
+    flex-direction: column;
+  }
+
+  .logo {
+    block-size: 2.25rem;
+  }
+}
 }
