@@ -1,5 +1,5 @@
 import { getValidQuizQuestions } from "../../utils/normalizeQuizQuestion.js";
-import { MIN_QUESTIONS } from "../../config/quiz.js";
+import { QUESTIONS_PER_QUIZ } from "../../config/quiz.js";
 import htmlQuestions from "./html.js";
 import cssQuestions from "./css.js";
 import jsQuestions from "./javascript.js";
@@ -22,9 +22,9 @@ export function getFallbackQuestions(topicId) {
   // Normalize and validate the fallback data before checking its size.
   const questions = getValidQuizQuestions(rawQuestions);
 
-  if (questions.length < MIN_QUESTIONS) {
+  if (questions.length < QUESTIONS_PER_QUIZ) {
     throw new RangeError(
-      `Expected at least ${MIN_QUESTIONS} fallback questions for topic "${topicId}", but received ${questions.length}.`,
+      `Expected at least ${QUESTIONS_PER_QUIZ} fallback questions for topic "${topicId}", but received ${questions.length}.`,
     );
   }
 
