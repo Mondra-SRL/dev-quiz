@@ -1,32 +1,35 @@
-@layer components {
 .main {
-  inline-size: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   align-items: flex-start;
+  box-sizing: border-box;
 }
 
 .question {
-  inline-size: 100%;
+  width: 100%;
   font-family: var(--font-question);
   line-height: var(--lh-relaxed);
-  text-align: start;
+  text-align: left;
   font-size: var(--fs-2xl);
+  margin: 0;
 }
 
 .answersGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(2, minmax(240px, 492px));
   justify-content: center;
-  inline-size: 100%;
-  min-inline-size: 0;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
   gap: var(--space-4);
-  align-items: stretch;
+  align-items: start;
 }
 
-@container screen (inline-size <= 48rem) {
+@media (max-width: 48em) {
   .question {
     text-align: center;
   }
@@ -39,5 +42,4 @@
   .main {
     gap: var(--space-4);
   }
-}
 }

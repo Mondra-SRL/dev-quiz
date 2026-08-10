@@ -1,112 +1,109 @@
-@layer components {
-.resultsCard,
-.scoreText,
-.resultsCopy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+/* Results Card wrapper */ 
 .resultsCard {
-  gap: var(--space-7);
-  inline-size: 100%;
+    display: flex; 
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+    gap: var(--space-7); /* 32px gap between children */
+    width: 100%; /* Full width of the parent */
 }
 
-/* Registration enables percentage interpolation inside the conic gradient. */
-@property --_score-pct {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
+/* Score Ring animation */ 
+/* browsers won't interpolate a conic gradient's custom property, in a
+/ * conic gradient unless it's registrared with an @property and given an expicit type */
+@property --score-pct {
+    syntax: '<percentage>'; /* Define the syntax for the custom property */
+    inherits: false; /* Do not inherit the property */
+    initial-value: 0%; /* Initial value of the property */
 }
 
+/* Scoring section styles */
 .scoreCard {
-  --_score-size: 17.5rem;
-  --_score-inner-size: 75%;
-
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  inline-size: min(100%, var(--_score-size));
-  aspect-ratio: 1;
+    position: relative; /* Position relative to allow absolute positioning of decorative elements */
+    display: flex;
+    align-items: center; /* Center children vertically */
+    justify-content: center; /* Center children horizontally */
+    width: 280px; /* Fixed width for the score card */
+    height: 280px; /* Fixed height for the score card */
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
-.scoreRing,
-.scoreRingMask,
-.scoreEllipseInsideBorder,
-.scoreEllipseOutsideBorder {
-  position: absolute;
-  border-radius: 50%;
-}
-
-.scoreRing,
-.scoreEllipseOutsideBorder {
-  inset: 0;
-}
-
+/* Score Ring styles */ 
 .scoreRing {
-
-  background: conic-gradient(
-    var(--color-olive-deep) 0% var(--_score-pct),
-    var(--color-merino) 0
-  );
-  transition: --_score-pct 1s ease-out;
+    position: absolute; /* Position absolute to overlay on the score card */
+    inset: 0; /* Fill the parent container */
+    border-radius: 50%; /* Make it a circle */
+    background: conic-gradient(var(--accent-primary-default) 0% var(--score-pct), var(--color-merino) 0);  /* gradient itself draws both colors in one shape */
+    transition: --score-pct 1s ease-out; /* Smooth transition for the score percentage change */
 }
 
 .scoreRingMask {
-  /* End the mask beneath the dashed stroke so the fill meets the border. */
-  inset: calc((100% - var(--_score-inner-size)) / 2 + var(--border-hairline));
-  background: var(--surface-primary);
+    position: absolute; /* centered in the score ring */
+    inset: 32px; /* 32px inset to create a mask effect */
+    border-radius: 50%; /* Make it a circle */
+    background: var(--surface-primary); /* Use the primary surface color for the mask */
 }
 
+/* Dashed decorative inner border */ 
 .scoreEllipseInsideBorder {
-  inline-size: var(--_score-inner-size);
-  block-size: var(--_score-inner-size);
-  border: var(--border-hairline) dashed var(--border-subtle);
+    position: absolute; /* Position absolute to overlay on the track */
+    width: 216px; /* Fixed width for the inner border */
+    height: 216px; /* Fixed height for the inner border */
+    border-radius: 50%; /* Make it a circle */
+    border: var(--border-hairline) dashed var(--border-subtle); /* Dashed border for decoration */
 }
 
+/* Solid decorative outer border */ 
 .scoreEllipseOutsideBorder {
-  border: var(--border-hairline) solid var(--border-subtle);
+    position: absolute; /* Position absolute to overlay on the track */
+    inset: 0; /* Fill the parent container */
+    border-radius: 50%; /* Make it a circle */
+    border: var(--border-hairline) solid var(--border-subtle); /* Solid border for decoration */
 }
 
 .scoreText {
-  position: relative;
-  z-index: 2;
-  gap: var(--space-2);
+    position: relative; /* Position relative to allow absolute positioning of the score value */
+    z-index: 2; /* Ensure the text is above the decorative elements */
+    display: flex; /* Display as a flex container */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children vertically */
+    gap: var(--space-2); /* 8px gap between children */
 }
 
 .scoreNumbers {
-  color: var(--text-secondary);
-  font-family: var(--font-display);
-  font-size: var(--fs-5xl);
-  font-weight: var(--fw-semibold);
-  line-height: var(--lh-tight);
-  letter-spacing: var(--ls-tight);
-  text-align: center;
+    font-family: var(--font-display); /* Use the display font */ 
+    font-weight: var(--fw-semibold); /* Semi-bold font weight */
+    font-size: var(--fs-5xl); /* 48px font size */
+    line-height: var(--lh-tight); /* Tight line height */
+    letter-spacing: var(--ls-tight); /* Tight letter spacing */
+    color: var(--text-secondary); /* Secondary text color */
+    text-align: center; /* Center the text */
 }
 
 .scoreLabel {
-  color: var(--text-tertiary);
-  font-family: var(--font-ui);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-bold);
-  line-height: 1;
-  letter-spacing: var(--ls-widest);
-  text-align: center;
-  text-transform: uppercase;
+    font-family: var(--font-ui); /* Use the UI font */
+    font-weight: var(--fw-bold); /* Bold font weight */
+    font-size: var(--fs-xl); /* 20px font size */
+    line-height: 1; 
+    letter-spacing: var(--ls-widest); /* Widest letter spacing */
+    text-transform: uppercase; /* Uppercase text */
+    color: var(--text-tertiary); /* Tertiary text color */
+    text-align: center; /* Center the text */
 }
 
+/* Results Copy */ 
 .resultsCopy {
-  gap: var(--space-3);
-  inline-size: 100%;
-  max-inline-size: 26.875rem;
-  text-align: center;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: var(--space-3); /* 16px gap between children */
+    text-align: center; /* Center the text */
+    width: 100%; /* Full width of the parent */
+    max-width: 430px; /* set maximum width for resultsCopy */ 
 }
 
+/* for users with have a reduced motion preference, disable the animation */
 @media (prefers-reduced-motion: reduce) {
-  .scoreRing {
-    transition: none;
-  }
-}
+    .scoreRing {
+        transition: none;
+    }
 }

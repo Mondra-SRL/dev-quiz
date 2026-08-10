@@ -69,23 +69,14 @@ function ExitQuizModal({ onContinue, onExit, returnFocusRef }) {
           </div>
 
           <div className={styles.buttons}>
-            <Button
-              ref={continueButtonRef}
-              className={styles.modalButton}
-              variant="primary"
-              onClick={onContinue}
-            >
+            <Button ref={continueButtonRef} variant="primary" onClick={onContinue}>
               Continue Quiz
               <img
                 src={arrowRightIconMerino}
                 alt=""
                 aria-hidden="true" />
             </Button>
-            <Button
-              className={styles.modalButton}
-              variant="secondary"
-              onClick={onExit}
-            >
+            <Button variant="secondary" onClick={onExit}>
               Exit Quiz
               <img
                 src={arrowRightIconPurple}
