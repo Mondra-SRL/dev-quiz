@@ -5,10 +5,14 @@ import badgeIcon from '../../assets/svg/badge-icon.svg';
 function FeedbackMessage({ isCorrect = false }) {
   const icon = isCorrect ? starIcon : badgeIcon;
   const label = isCorrect ? 'Correct!' : 'Not quite!';
-  const stateClass = isCorrect ? styles.correct : styles.incorrect;
+  const feedbackState = isCorrect ? 'correct' : 'incorrect';
 
   return (
-    <div className={`${styles.feedbackMessage} ${stateClass}`} role="status">
+    <div
+      className={styles.feedbackMessage}
+      data-feedback-state={feedbackState}
+      role="status"
+    >
       <img src={icon} alt="" className={styles.icon} aria-hidden="true" />
       <span className={styles.label}>{label}</span>
     </div>

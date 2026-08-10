@@ -1,9 +1,10 @@
+@layer components {
 .inlineCode {
-  font-size: 0.9em;
+  font-size: var(--fs-sm);
 }
 
 .codeBlock {
-  width: 100%;
+  inline-size: 100%;
   margin: 0;
   line-height: var(--lh-relaxed);
   white-space: pre-wrap;
@@ -12,9 +13,10 @@
 .codeBlock code {
   padding: 0;
   font-size: inherit;
-  background: transparent;
+  background: var(--color-transparent);
 }
 
 .trailingText {
-  width: 100%;
+  inline-size: 100%;
+}
 }

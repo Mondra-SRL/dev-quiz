@@ -1,4 +1,5 @@
 import styles from './FormattedText.module.css';
+import { formatCodeBlock } from '../../utils/formatCodeBlock';
 
 export function InlineCodeText({ text }) {
   const parts = text.split(/(`[^`]+`)/g);
@@ -30,7 +31,7 @@ export function FormattedQuestion({ text, id, className }) {
   const prompt = text.slice(0, fencedCode.index).trim();
   const trailingText = text.slice(fencedCode.index + fencedCode[0].length).trim();
   const language = fencedCode[1];
-  const code = fencedCode[2].trim();
+  const code = formatCodeBlock(fencedCode[2], language);
 
   return (
     <>

@@ -24,7 +24,7 @@ function ResultsCard({ score, totalQuestions }) {
   return (
     <div className={styles.resultsCard}>
             <div className={styles.scoreCard}>
-                <div className={styles.scoreRing}  style={{ '--score-pct': `${Math.min(animatedPercentage, 100)}%` }}/> 
+                <div className={styles.scoreRing}  style={{ '--_score-pct': `${Math.min(animatedPercentage, 100)}%` }}/>
                 <div className={styles.scoreRingMask} />
                 <div className={styles.scoreEllipseOutsideBorder} />
                 <div className={styles.scoreEllipseInsideBorder} />

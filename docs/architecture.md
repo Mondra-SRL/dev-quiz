@@ -198,10 +198,10 @@ Navigation is state-based rather than route-based. Valid screen values are:
 ### Global Styles
 
 - `globals.css`
-  - Contains global reset rules, typography defaults, body styles, and shared layout rules applied across the application.
+  - Declares the global cascade order—`reset`, `base`, `components`, then `utilities`—before any named layer is used. It is imported before `variables.css` and also contains global reset rules, typography defaults, body styles, the app shell, and accessibility utilities.
 
 - `variables.css`
-  - Contains reusable CSS custom properties such as colors, spacing, font sizes, border radius values, shadows, and other design tokens.
+  - Contains reusable CSS custom properties such as colors, spacing, font sizes, border radius values, shadows, and other design tokens inside the `base` layer.
 
 ### Component Styles
 
@@ -219,7 +219,7 @@ Examples:
 - `ExitQuizModal/ExitQuizModal.module.css`
 - `ResultsCard/ResultsCard.module.css`
 
-These files contain styles specific to their component only.
+These files contain styles specific to their component only. Reusable component styles belong to the `components` layer.
 
 ### Screen Styles
 
@@ -231,7 +231,7 @@ Examples:
 - `QuizScreen/QuizScreen.module.css`
 - `ResultsScreen/ResultsScreen.module.css`
 
-These files are responsible for screen-level layout and positioning.
+These files are responsible for screen-level layout and positioning. Because each screen is an application component with locally scoped styles, its rules belong to the `components` layer.
 
 ## CSS ORGANIZATION RULES
 
@@ -239,7 +239,29 @@ These files are responsible for screen-level layout and positioning.
 - Keep reusable design values inside `variables.css`.
 - Keep component-specific styles inside the component's CSS file.
 - Keep screen-specific layout styles inside the screen's CSS file.
-- Avoid large centralized CSS files containing styles for unrelated components.
+- Keep every rule inside the appropriate cascade layer declared at the top of `globals.css`; avoid unlayered rules.
+- `ScreenLayout` establishes the named inline-size container `screen`. Use `@container screen` for component and screen styles that should adapt to the card's available width; reserve viewport media queries for page-level behavior and user preferences.
+- Use CSS variables that start with `--_`, such as `--_button-bg`, for values used only inside one component. The underscore signals that the variable is an internal setting, which makes it easier to understand where it is safe to use and change.
+- Define a component's private variables in its main rule, then change only those variables for variants or states such as hover, disabled, or selected. This keeps the actual CSS properties in one place, reduces repeated code, and makes every state easier to update consistently.
+
+  For example, the base button rule applies its background and text color once. The disabled state changes only the private variables, and the base declarations automatically use the new values:
+
+  ```css
+  .button {
+    --_button-bg: var(--action-primary-bg);
+    --_button-color: var(--action-primary-text);
+
+    background: var(--_button-bg);
+    color: var(--_button-color);
+  }
+
+  .button:disabled {
+    --_button-bg: var(--surface-disabled);
+    --_button-color: var(--text-tertiary);
+  }
+  ```
+
+- Keep unrelated component styles in separate CSS files instead of collecting everything in one large stylesheet. Smaller, focused files are easier to navigate, review, and change without accidentally affecting another part of the application.
 - Avoid styling a component from another component's CSS file.
 - Reuse CSS variables whenever possible instead of hardcoding values.
 - Use clear and consistent class names.
