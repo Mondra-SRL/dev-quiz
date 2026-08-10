@@ -26,6 +26,3 @@ dist-ssr
 .env
 .vercel
 .env*
-
-# Local agent skills
-.skills/
