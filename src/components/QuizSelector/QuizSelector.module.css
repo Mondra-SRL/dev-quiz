@@ -11,6 +11,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-6);
+  min-width: 0;
   padding: var(--space-6) var(--space-7);
   background: var(--surface-secondary);
   border: var(--border-thin) solid var(--border-subtle);
@@ -46,11 +47,13 @@
 }
 
 .name {
+  min-width: 0;
   font-family: var(--font-ui);
   font-weight: var(--fw-bold);
   font-size: var(--fs-base);
   line-height: var(--lh-tight);
   color: var(--text-primary);
+  overflow-wrap: anywhere;
 }
 
 .card:has(:checked) .name {

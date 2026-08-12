@@ -13,8 +13,12 @@
   align-items: center;
   justify-content: center;
   width: min(394px, 100%);
+  max-height: calc(100vh - var(--space-7));
+  max-height: calc(100dvh - var(--space-7));
   padding: var(--space-6) var(--space-4);
-  overflow: hidden;
+  /* Let tall content scroll on short screens without creating a sideways scrollbar. */
+  overflow-y: auto;
+  overflow-x: hidden;
   color: var(--text-primary);
   background: var(--bg-canvas);
   border-radius: var(--radius-xl);
@@ -26,6 +30,7 @@
   align-items: center;
   gap: var(--space-8);
   width: 100%;
+  min-width: 0;
 }
 
 .logoWrapper {
@@ -80,6 +85,7 @@
   align-items: stretch;
   gap: var(--space-3);
   width: 100%;
+  min-width: 0;
 }
 
 .buttons > button {

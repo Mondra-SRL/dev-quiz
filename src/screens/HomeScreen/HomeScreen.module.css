@@ -23,6 +23,7 @@
   gap: var(--space-5);
   text-align: center;
   width: 100%;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 48em) {

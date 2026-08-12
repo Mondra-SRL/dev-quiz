@@ -76,6 +76,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
 }
 
 /* Dot-grain paper texture, painted behind all content */
@@ -240,6 +241,7 @@ svg {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  min-width: 0;
 }
 
 /* Screen-reader-only helper for visually hidden labels */
