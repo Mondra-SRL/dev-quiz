@@ -4,9 +4,9 @@
   border-radius: var(--radius-pill);
   background: var(--surface-secondary);
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 0 0 var(--border-hairline) rgba(0, 0, 0, 0.05);
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: var(--border-hairline) solid rgba(0, 0, 0, 0.1);
 }
 /* update the progress-bar*/
 .fill {

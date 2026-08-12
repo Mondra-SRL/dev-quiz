@@ -13,15 +13,12 @@
     --color-nougat:       #EFE9DA;
     --color-sand:         #D8D0BD;
 
-    --color-lime:         #AEC84B;
     --color-lime-soft:    #C6D97E;
     --color-lime-tint:    #EBEFD3;
     --color-olive-deep:   #7C9A35;
     --color-olive-ink:    #5C7327;
     --color-olive-accessible: #546A24;
 
-    --color-mauve:        #A98792;
-    --color-mauve-deep:   #8E6A76;
     --color-mauve-ink:    #6F4F5A;
     --color-mauve-tint:   #EBDFE2;
 
@@ -34,12 +31,7 @@
     --color-coral-peach:  #FFAC8E;
     --color-brown:        #914D35;
 
-    --color-white:        #FFFFFF;
-    --color-orange:       #F5845C;
-    --color-blue:         #5C7DF5;
-
     --color-muted-on-light: rgba(51, 50, 43, 0.80);
-    --color-muted-on-dark:  rgba(51, 50, 43, 0.60);
 
     --color-transparent: transparent;  /* For any time you need a true transparent value. Avoid using rgba(0,0,0,0) or similar in your CSS. */
 
@@ -53,11 +45,8 @@
     --space-6:  1.5rem;    /* 24px  */
     --space-7:  2rem;      /* 32px  */
     --space-8:  2.5rem;    /* 40px  */
-    --space-9:  3rem;      /* 48px  */
     --space-10: 4rem;      /* 64px  */
-    --space-11: 5rem;      /* 80px  */
     --space-12: 6rem;      /* 96px  */
-    --space-13: 7.5rem;    /* 120px */
   
     /* Radius */
     --radius-sm:   4px;
@@ -79,7 +68,6 @@
 
     /* Font-weight */
     --fw-regular:  400;
-    --fw-medium:   500;
     --fw-semibold: 600;
     --fw-bold:     700;
 
@@ -101,7 +89,6 @@
     /* Letter-spacing */
     --ls-tight:   -0.5px;  /* h1 */
     --ls-normal:   0px;    /* body */
-    --ls-wide:     0.25px; /* eyebrow */
     --ls-wider:    0.5px;  /* button */
     --ls-widest:   1px;    /* all-caps button */
   
@@ -120,8 +107,6 @@
     --border-subtle: var(--color-ink-soft);
     --border-green: var(--color-olive-ink);   /* Used for green-accented borders, e.g. correct-answer highlights or active selections. */
     --border-red: var(--color-rust);          /* Used for red-accented borders, e.g. incorrect-answer highlights or error states. */
-    --border-ghost: var(--color-sand);       /* A very light, almost invisible border color. Used for subtle dividers or focus outlines that shouldn't be too visually heavy. */
-
     --action-primary-bg: var(--color-olive-accessible);  /* Accessible olive for primary button contrast. */
     --action-primary-text: var(--text-inverse);  /* Text color for primary actions. Should have high contrast against the primary background. */ 
     --action-secondary-bg: var(--color-transparent);  /* Secondary brand color. Used for secondary buttons, secondary feature blocks, or illustrative accents. */
@@ -131,18 +116,11 @@
     --accent-primary-subtle: var(--color-lime-soft);  /* Badges, selection states, highlighted containers */
     --accent-primary-strong: var(--color-olive-ink);  /* Hover states, active states, or any time you want a stronger emphasis than the default primary */
     --accent-primary-ghost: var(--color-lime-tint);  /* Lightest lime surface. Used for hover backgrounds or very subtle selection highlights. */
-    --accent-secondary-default: var(--color-mauve);  /* Raw secondary brand color. Use it for secondary feature blocks, illustrative accents, or secondary metric numbers on a dashboard. */
     --accent-secondary-subtle: var(--color-mauve-tint);  /* A very soft tint of your secondary color. Used for the background of specific feature cards, banners, or specialized category tags. */
     --accent-secondary-strong: var(--color-mauve-ink);  /* Accessible secondary text and border color. */
-    --accent-tertiary-default: var(--color-rust);  /* A tertiary accent color. Use it for destructive actions, error states, or any time you want a strong contrast against both primary and secondary colors. */ 
     --accent-tertiary-ghost: var(--color-rust-tint);  /* A soft tint of your tertiary color. Used for error state backgrounds, destructive action hover states, or subtle highlights that still need to read as "dangerous". */
     --accent-tertiary-subtle: var(--color-coral-peach);  /* A softer, more approachable version of your tertiary color. Used for warning states, less severe destructive actions, or any time you want to convey caution without the full intensity of the default tertiary. */
     --accent-tertiary-strong: var(--color-brown);  /* A deeper, more muted version of your tertiary color. Used for error state text, secondary destructive action text, or any time you want a more serious, grounded tone than the default tertiary. */
-
-    --feedback-success: var(--color-lime);  /* Green — for completed tasks or confirmation */
-    --feedback-warning: var(--color-orange);  /* Yellow/Orange — for alerts or pending states */
-    --feedback-error: var(--color-rust);  /* Red — for system errors or destructive actions*/
-    --feedback-info: var(--color-blue);  /* Blue — for informational messages or neutral actions */
 
     /* Accessibility */
     --focus-ring: var(--color-olive-accessible);
@@ -154,8 +132,23 @@
     --shadow-content:
       0 4px   4px  0 rgba(0,0,0,0.251),
       0 18px  39px 0 rgba(0,0,0,0.051),
-      0 71px  71px 0 rgba(0,0,0,0.039),
-      0 161px 96px 0 rgba(0,0,0,0.031),
-      0 285px 114px 0 rgba(0,0,0,0.012);  /* Multi-layer shadow for quiz cards and main content panels. */
+      0 71px  71px 0 rgba(0,0,0,0.039);  /* Multi-layer shadow for quiz cards and main content panels. */
+    --shadow-button-active:
+      inset 2px 0 10px rgba(0, 0, 0, 0.25),
+      inset 0 4px 10px var(--color-charcoal);
 
+}
+
+/* Keep high-contrast theme overrides with the tokens they replace. */
+@media (prefers-contrast: more) {
+  :root {
+    --text-tertiary: var(--text-primary);
+    --border-subtle: var(--text-primary);
+    --action-primary-bg: var(--text-primary);
+    --action-secondary-text: var(--text-primary);
+    --focus-ring: var(--text-primary);
+    --link-text: var(--text-primary);
+    --status-success-text: var(--text-primary);
+    --status-error-text: var(--text-primary);
+  }
 }

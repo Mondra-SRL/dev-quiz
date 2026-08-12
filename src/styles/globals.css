@@ -256,19 +256,6 @@ svg {
   border: 0;
 }
 
-@media (prefers-contrast: more) {
-  :root {
-    --text-tertiary: var(--text-primary);
-    --border-subtle: var(--text-primary);
-    --action-primary-bg: var(--text-primary);
-    --action-secondary-text: var(--text-primary);
-    --focus-ring: var(--text-primary);
-    --link-text: var(--text-primary);
-    --status-success-text: var(--text-primary);
-    --status-error-text: var(--text-primary);
-  }
-}
-
 @media (forced-colors: active) {
   body {
     background: Canvas;

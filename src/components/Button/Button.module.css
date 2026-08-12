@@ -38,9 +38,7 @@
 
 .primary:active:not(:disabled) {
   background: var(--action-primary-bg);
-  box-shadow:
-    inset 2px 0 10px rgba(0, 0, 0, 0.25),
-    inset 0 4px 10px var(--color-charcoal);
+  box-shadow: var(--shadow-button-active);
 }
 
 .button:focus-visible {

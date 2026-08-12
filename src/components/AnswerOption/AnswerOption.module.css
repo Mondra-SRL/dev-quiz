@@ -6,7 +6,7 @@
   height: 78px;
   padding: var(--space-4);
   border-radius: var(--radius-xl);
-  border: 1px solid var(--border-subtle);
+  border: var(--border-hairline) solid var(--border-subtle);
   background: var(--surface-primary);
   color: var(--text-primary);
   text-align: left;
@@ -54,7 +54,7 @@
   background: var(--surface-primary);
   font-weight: var(--fw-bold);
   border: var(--border-thin) solid var(--border-subtle);
-  background-color: var(--color-sand);
+  background-color: var(--surface-disabled);
 }
 
 .answerOption[data-state="correct"] .letter,
