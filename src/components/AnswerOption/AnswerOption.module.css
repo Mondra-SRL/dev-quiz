@@ -2,14 +2,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-4); /* 16px */
-  width: 100%;
-  height: 78px;
+  inline-size: 100%;
+  min-block-size: 4.875rem;
   padding: var(--space-4);
   border-radius: var(--radius-xl);
   border: var(--border-hairline) solid var(--border-subtle);
   background: var(--surface-primary);
   color: var(--text-primary);
-  text-align: left;
+  text-align: start;
   box-sizing: border-box;
   cursor: pointer;
 }
@@ -48,8 +48,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
   border-radius: var(--radius-md);
   background: var(--surface-primary);
   font-weight: var(--fw-bold);
@@ -73,6 +73,9 @@
 .text {
   display: block;
   flex: 1;
+  min-inline-size: 0;
+  /* Break very long words or code so they stay inside the answer button. */
+  overflow-wrap: anywhere;
 }
 
 .statusIndicator {
@@ -80,8 +83,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
   font-size: var(--fs-xl);
   font-weight: var(--fw-bold);
   line-height: 1;

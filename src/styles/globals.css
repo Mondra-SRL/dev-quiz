@@ -58,7 +58,7 @@ html {
 html,
 body,
 #root {
-  height: 100%;
+  block-size: 100%;
 }
 
 /* ---------- Base ---------- */
@@ -194,7 +194,7 @@ ol {
 img,
 svg {
   display: block;
-  max-width: 100%;
+  max-inline-size: 100%;
 }
 
 /* ---------- Accessibility ---------- */
@@ -210,8 +210,9 @@ svg {
   inset-block-start: var(--space-2);
   inset-inline-start: var(--space-2);
   z-index: 2000;
-  min-height: 44px;
-  padding: var(--space-3) var(--space-4);
+  min-block-size: 2.75rem;
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
   color: var(--text-primary);
   background: var(--surface-secondary);
   border: var(--border-medium) solid var(--focus-ring);
@@ -239,14 +240,14 @@ svg {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-block-size: 100%;
 }
 
 /* Screen-reader-only helper for visually hidden labels */
 .visually-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inline-size: 1px;
+  block-size: 1px;
   padding: 0;
   margin: -1px;
   overflow: hidden;
