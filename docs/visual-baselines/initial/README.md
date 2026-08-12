@@ -27,9 +27,7 @@ Every screen and state below must be captured at all four viewports.
 | Home | Topic grid, topic labels, paper card, and primary action |
 | Quiz | Quiz metadata, answer layout, and actions |
 | Results | Score ring, result copy, and actions |
-| Loading | Loading treatment remains centered and unclipped |
 | Quiz validated | Feedback, explanation, and next action remain visible and reachable |
-| Error | Error message and recovery action remain visible and reachable |
 | Exit modal | Dialog content and actions fit without clipping |
 
 ## Capture checklist
@@ -46,18 +44,10 @@ Every screen and state below must be captured at all four viewports.
 - [ ] `results-tablet-landscape.png`
 - [ ] `results-tablet-portrait.png`
 - [ ] `results-mobile.png`
-- [ ] `loading-desktop.png`
-- [ ] `loading-tablet-landscape.png`
-- [ ] `loading-tablet-portrait.png`
-- [ ] `loading-mobile.png`
 - [ ] `quiz-validated-desktop.png`
 - [ ] `quiz-validated-tablet-landscape.png`
 - [ ] `quiz-validated-tablet-portrait.png`
 - [ ] `quiz-validated-mobile.png`
-- [ ] `error-desktop.png`
-- [ ] `error-tablet-landscape.png`
-- [ ] `error-tablet-portrait.png`
-- [ ] `error-mobile.png`
 - [ ] `exit-modal-desktop.png`
 - [ ] `exit-modal-tablet-landscape.png`
 - [ ] `exit-modal-tablet-portrait.png`
