@@ -27,10 +27,6 @@ Use:
 - reduced-motion, increased-contrast, and forced-colors media queries
 - global cascade layers
 
-Do not add advanced features in this work, including container queries,
-`:has()`, CSS nesting, `@property`, anchor positioning, view transitions, or
-scroll-driven animations.
-
 Add a fallback before a dynamic viewport value:
 
 ```css
