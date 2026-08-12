@@ -96,7 +96,7 @@
 
 @media (prefers-contrast: more) {
   .button {
-    border-width: var(--border-medium);
+    border: var(--border-medium) solid currentColor;
   }
 }
 

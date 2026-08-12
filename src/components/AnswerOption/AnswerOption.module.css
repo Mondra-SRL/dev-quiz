@@ -14,7 +14,7 @@
   cursor: pointer;
 }
 
-.answerOption:has(input:not(:disabled)):hover {
+.answerOption:not(:disabled):hover {
   background-color: var(--surface-hover);
   border-color: var(--text-secondary);
   box-shadow: inset 0 0 0 var(--border-hairline) var(--text-secondary);
@@ -25,7 +25,7 @@
   outline-offset: 3px;
 }
 
-.answerOption:has(input:disabled) {
+.answerOption:disabled {
   cursor: not-allowed;
 }
 
@@ -107,5 +107,11 @@
 
   .answerOption:focus-visible {
     outline-color: Highlight;
+  }
+
+  .answerOption[data-state="correct"],
+  .answerOption[data-state="reveal"] {
+    color: Highlight;
+    border-color: Highlight;
   }
 }

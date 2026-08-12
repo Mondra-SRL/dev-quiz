@@ -87,4 +87,13 @@
   .card:has(input:focus-visible) {
     outline-color: Highlight;
   }
+
+  .card:has(:checked) {
+    color: Highlight;
+    border-color: Highlight;
+  }
+
+  .card:has(:checked) .name {
+    color: Highlight;
+  }
 }
