@@ -69,6 +69,7 @@ project-root/
 |   |   |-- ExplanationBox/
 |   |   |-- FeedbackMessage/
 |   |   |-- FormattedText/
+|   |   |-- LogoLink/
 |   |   |-- QuestionCard/
 |   |   |-- QuizSelector/
 |   |   |-- ResultsCard/
@@ -127,6 +128,7 @@ Each component lives in its own folder (`ComponentName/`) containing the `.jsx` 
 - `AnswerOption`: individual answer option UI
 - `FeedbackMessage`: correct/incorrect feedback after validation
 - `ExplanationBox`: question explanation after validation
+- `LogoLink`: shared, accessible DevQuiz logo link used to return to the Home screen
 - `TimerBar`: countdown display and progress bar
 - `ScreenLayout`: shared layout wrapper for screens with decorative canvas/card framing
 - `ExitQuizModal`: exit confirmation dialog
@@ -237,6 +239,7 @@ Examples:
 - `AnswerOption/AnswerOption.module.css`
 - `FeedbackMessage/FeedbackMessage.module.css`
 - `ExplanationBox/ExplanationBox.module.css`
+- `LogoLink/LogoLink.module.css`
 - `TimerBar/TimerBar.module.css`
 - `ExitQuizModal/ExitQuizModal.module.css`
 - `ResultsCard/ResultsCard.module.css`
