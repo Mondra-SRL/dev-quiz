@@ -3,8 +3,9 @@
 }
 
 .codeBlock {
-  width: 100%;
-  margin: 0;
+  inline-size: 100%;
+  margin-block: 0;
+  margin-inline: 0;
   line-height: var(--lh-relaxed);
   white-space: pre-wrap;
 }
@@ -16,5 +17,5 @@
 }
 
 .trailingText {
-  width: 100%;
+  inline-size: 100%;
 }

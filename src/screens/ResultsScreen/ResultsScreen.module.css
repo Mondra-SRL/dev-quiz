@@ -3,7 +3,7 @@
 .header {
     display: flex; 
     align-items: center; /* Center children vertically */
-    width: 100%; /* Full width of the parent */
+    inline-size: 100%; /* Full width of the parent */
 
     /* mobile styling for header */ 
     @media (max-width: 48em){
@@ -12,12 +12,12 @@
 }
 
 .logo{
-    height: 44px; 
-    width: auto; /* Maintain aspect ratio */
+    block-size: 2.75rem;
+    inline-size: auto; /* Maintain aspect ratio */
 
     /* mobile styles */
     @media (max-width: 48em){
-        height: 36px; /* Reduce height for smaller screens */
+        block-size: 2.25rem; /* Reduce height for smaller screens */
     }
 }
 
@@ -26,7 +26,7 @@
     flex-direction: column; 
     align-items: center; 
     gap: var(--space-7); /* 32px gap between children */
-    width: 100%; /* Full width of the parent */
+    inline-size: 100%; /* Full width of the parent */
 }
 
 .headerTitle {
@@ -38,7 +38,7 @@
     display: flex;
     flex-direction: row; /* Side by side on desktop */
     gap: var(--space-4); /* 16px gap between children */
-    width: 100%; /* Full width of the parent */
+    inline-size: 100%; /* Full width of the parent */
     justify-content: center; /* Center children horizontally */
 
     @media (max-width: 48em){
