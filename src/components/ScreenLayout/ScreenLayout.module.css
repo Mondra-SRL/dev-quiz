@@ -27,6 +27,17 @@
   overflow: clip;
 }
 
+/* Keep content usable at high browser zoom before the mobile layout starts. */
+@media (max-width: 56em) {
+  .canvas {
+    padding: var(--space-6);
+  }
+
+  .card {
+    padding-inline: var(--space-6);
+  }
+}
+
 .card:focus-visible {
   outline-offset: calc(-1 * var(--space-2));
 }

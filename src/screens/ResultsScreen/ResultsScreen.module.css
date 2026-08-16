@@ -31,6 +31,7 @@
 
 .headerTitle {
     text-align: center; /* Center the text */
+    overflow-wrap: anywhere;
 }
 
 /* actions styling */

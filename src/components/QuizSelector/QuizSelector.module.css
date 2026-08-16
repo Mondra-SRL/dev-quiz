@@ -47,11 +47,13 @@
 }
 
 .name {
+  min-width: 0;
   font-family: var(--font-ui);
   font-weight: var(--fw-bold);
   font-size: var(--fs-base);
   line-height: var(--lh-tight);
   color: var(--text-primary);
+  overflow-wrap: anywhere;
 }
 
 .card:has(:checked) .name {
