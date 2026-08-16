@@ -1,10 +1,13 @@
 /* =============================================================
    DevQuiz — Design Tokens
    Mirrors the current Figma variables (file: Quiz App https://www.figma.com/design/bjSH4xpgWptKjggpjRC2y6/Quiz-App?node-id=4-31&t=3vBtLBIBcv8fLeTa-1).
-   Layers:  primitives → theme (semantic) → component
+   Token groups: primitives → theme (semantic) → component
    ============================================================= */
 
-   :root {
+@layer reset, tokens, base, utilities;
+
+@layer tokens {
+  :root {
     /* ============ PRIMITIVES ============ */
 
     /* Color (primitives) */
@@ -137,6 +140,7 @@
       inset 2px 0 10px rgba(0, 0, 0, 0.25),
       inset 0 4px 10px var(--color-charcoal);
 
+  }
 }
 
 /* Keep high-contrast theme overrides with the tokens they replace. */
