@@ -54,11 +54,6 @@
   min-width: 0;
 }
 
-.logo {
-  block-size: 2.25rem;
-  inline-size: auto;
-}
-
 .timerMeta {
   display: flex;
   align-items: center;
@@ -154,11 +149,6 @@
     align-items: center;
     gap: var(--space-4);
     flex-wrap: wrap;
-  }
-
-  .logo {
-    block-size: var(--space-7);
-    inline-size: auto;
   }
 
   .timerMeta {

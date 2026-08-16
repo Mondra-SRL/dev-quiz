@@ -11,16 +11,6 @@
     }
 }
 
-.logo{
-    block-size: 2.75rem;
-    inline-size: auto; /* Maintain aspect ratio */
-
-    /* mobile styles */
-    @media (max-width: 48em){
-        block-size: 2.25rem; /* Reduce height for smaller screens */
-    }
-}
-
 .quizContent {
     display: flex; 
     flex-direction: column; 

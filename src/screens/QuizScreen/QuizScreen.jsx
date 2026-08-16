@@ -8,8 +8,8 @@ import TimerBar from "../../components/TimerBar";
 import Button from "../../components/Button";
 import ArrowRightIcon from "../../components/ArrowRightIcon";
 import ExitQuizModal from "../../components/ExitQuizModal";
+import LogoLink from "../../components/LogoLink";
 import styles from "./QuizScreen.module.css";
-import logo from "../../assets/svg/logo-desktop-on-light.svg";
 import clockIcon from "../../assets/svg/clock-icon.svg";
 import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
 import { fetchQuizQuestions } from "../../services/quizApi";
@@ -271,7 +271,7 @@ function QuizScreen({
       <ScreenLayout inert={isExitModalOpen}>
       <header className={styles.header}>
         <div className={styles.rowTop}>
-          <img src={logo} alt="devquiz" className={styles.logo} />
+          <LogoLink onNavigate={onCancel} size="compact" />
           <div className={styles.timerMeta}>
             <img
               src={clockIcon}

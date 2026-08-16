@@ -122,7 +122,7 @@
     --accent-secondary-subtle: var(--color-mauve-tint);  /* A very soft tint of your secondary color. Used for the background of specific feature cards, banners, or specialized category tags. */
     --accent-secondary-strong: var(--color-mauve-ink);  /* Accessible secondary text and border color. */
     --accent-tertiary-ghost: var(--color-rust-tint);  /* A soft tint of your tertiary color. Used for error state backgrounds, destructive action hover states, or subtle highlights that still need to read as "dangerous". */
-    --accent-tertiary-subtle: var(--color-coral-peach);  /* A softer, more approachable version of your tertiary color. Used for warning states, less severe destructive actions, or any time you want to convey caution without the full intensity of the default tertiary. */
+    --accent-tertiary-subtle: var(--color-rust);  /* A softer, more approachable version of your tertiary color. Used for warning states, less severe destructive actions, or any time you want to convey caution without the full intensity of the default tertiary. */
     --accent-tertiary-strong: var(--color-brown);  /* A deeper, more muted version of your tertiary color. Used for error state text, secondary destructive action text, or any time you want a more serious, grounded tone than the default tertiary. */
 
     /* Accessibility */
