@@ -1,12 +1,14 @@
 /* Global app styles */
 /* =============================================================
    DevQuiz — Global Styles
-   Reset + base element styling + paper background + app shell.
+   Layered reset, base element styling, paper background, and utilities.
    Component-specific rules live in each component's *.module.css.
+   Accessibility overrides that must affect components remain unlayered.
    ============================================================= */
 
 /* Self-hosted fonts avoid a render-blocking request to Google Fonts and keep
    typography available when the app is offline. */
+@layer base {
 @font-face {
   font-family: 'Fraunces';
   src: url('../assets/fonts/Fraunces-SemiBold.woff2') format('woff2');
@@ -38,8 +40,10 @@
   font-weight: 700;
   font-display: swap;
 }
+}
 
 /* ---------- Reset ---------- */
+@layer reset {
 *,
 *::before,
 *::after {
@@ -58,10 +62,12 @@ html {
 html,
 body,
 #root {
-  height: 100%;
+  block-size: 100%;
+}
 }
 
 /* ---------- Base ---------- */
+@layer base {
 body {
   font-family: var(--font-ui);
   font-size: var(--fs-base);
@@ -167,8 +173,10 @@ a {
 a:hover {
   text-decoration-thickness: 0.14em;
 }
+}
 
 /* ---------- Action resets ---------- */
+@layer reset {
 /*button resets are essential — without font: inherit, browsers apply their own font to buttons */
 button,
 select {
@@ -195,11 +203,13 @@ ol {
 img,
 svg {
   display: block;
-  max-width: 100%;
+  max-inline-size: 100%;
+}
 }
 
 /* ---------- Accessibility ---------- */
 /* Shared keyboard-focus indicator. */
+@layer utilities {
 :focus-visible {
   outline: var(--border-medium) solid var(--focus-ring);
   outline-offset: 3px;
@@ -211,8 +221,9 @@ svg {
   inset-block-start: var(--space-2);
   inset-inline-start: var(--space-2);
   z-index: 2000;
-  min-height: 44px;
-  padding: var(--space-3) var(--space-4);
+  min-block-size: 2.75rem;
+  padding-block: var(--space-3);
+  padding-inline: var(--space-4);
   color: var(--text-primary);
   background: var(--surface-secondary);
   border: var(--border-medium) solid var(--focus-ring);
@@ -223,6 +234,7 @@ svg {
 
 .skip-link:focus-visible {
   transform: translateY(0);
+}
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -237,18 +249,20 @@ svg {
 }
 
 /* ---------- App shell ---------- */
+@layer base {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  min-width: 0;
+  min-block-size: 100%;
+}
 }
 
 /* Screen-reader-only helper for visually hidden labels */
+@layer utilities {
 .visually-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inline-size: 1px;
+  block-size: 1px;
   padding: 0;
   margin: -1px;
   overflow: hidden;
@@ -257,7 +271,9 @@ svg {
   white-space: nowrap;
   border: 0;
 }
+}
 
+@layer tokens {
 @media (prefers-contrast: more) {
   :root {
     --text-tertiary: var(--text-primary);
@@ -269,6 +285,7 @@ svg {
     --status-success-text: var(--text-primary);
     --status-error-text: var(--text-primary);
   }
+}
 }
 
 @media (forced-colors: active) {

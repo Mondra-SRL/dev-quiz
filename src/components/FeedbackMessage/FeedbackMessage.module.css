@@ -9,8 +9,8 @@
 }
 
 .feedbackMessage .icon {
-  width: 18px;
-  height: 18px;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
 }
 
 .feedbackMessage.correct {

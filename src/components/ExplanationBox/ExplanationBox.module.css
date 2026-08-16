@@ -1,9 +1,10 @@
 .explanationBox {
-  border: 2px dashed rgba(0,0,0, 0.2);
+  border: var(--border-medium) dashed rgba(0,0,0, 0.2);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
-  margin: 0 auto;
-  max-width: 720px;
+  margin-block: 0;
+  margin-inline: auto;
+  max-inline-size: 45rem;
   background: transparent;
 }
 
