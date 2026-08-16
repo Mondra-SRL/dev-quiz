@@ -32,13 +32,13 @@
     position: absolute; /* Position absolute to overlay on the score card */
     inset: 0; /* Fill the parent container */
     border-radius: 50%; /* Make it a circle */
-    background: conic-gradient(var(--accent-primary-default) 0% var(--score-pct), var(--color-merino) 0);  /* gradient itself draws both colors in one shape */
+    background: conic-gradient(var(--accent-primary-default) 0% var(--score-pct), var(--surface-secondary) 0);  /* gradient itself draws both colors in one shape */
     transition: --score-pct 1s ease-out; /* Smooth transition for the score percentage change */
 }
 
 .scoreRingMask {
     position: absolute; /* centered in the score ring */
-    inset: 32px; /* 32px inset to create a mask effect */
+    inset: var(--space-7); /* 32px inset to create a mask effect */
     border-radius: 50%; /* Make it a circle */
     background: var(--surface-primary); /* Use the primary surface color for the mask */
 }

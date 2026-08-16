@@ -59,8 +59,8 @@
 
 .badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: var(--space-3);
+  right: var(--space-3);
   width: 24px;
   height: 24px;
   display: none;

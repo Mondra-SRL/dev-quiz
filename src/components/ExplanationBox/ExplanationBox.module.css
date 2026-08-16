@@ -1,5 +1,5 @@
 .explanationBox {
-  border: 2px dashed rgba(0,0,0, 0.2);
+  border: var(--border-medium) dashed rgba(0,0,0, 0.2);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   margin: 0 auto;
