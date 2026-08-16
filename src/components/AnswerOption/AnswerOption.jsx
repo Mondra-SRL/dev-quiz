@@ -1,25 +1,35 @@
+import { forwardRef } from 'react';
 import styles from './AnswerOption.module.css';
 import { InlineCodeText } from '../FormattedText';
 
-function AnswerOption({ letter, description, status, checked, onSelect, disabled }) {
+const AnswerOption = forwardRef(function AnswerOption({
+  letter,
+  description,
+  status,
+  checked,
+  onSelect,
+  disabled,
+  onKeyDown,
+}, ref) {
   const statusMessage = status === 'incorrect'
     ? 'Your answer, incorrect.'
     : status
       ? 'Correct answer.'
       : '';
-  const statusSymbol = status === 'incorrect' ? '×' : status ? '✓' : '';
+  const statusSymbol = status === 'incorrect' ? '\u00D7' : status ? '\u2713' : '';
 
   return (
-    <label className={styles.answerOption} data-state={status}>
-      <input
-        type="radio"
-        name="answer"
-        value={description}
-        checked={checked}
-        onChange={onSelect}
-        disabled={disabled}
-        className="visually-hidden"
-      />
+    <button
+      ref={ref}
+      type="button"
+      className={styles.answerOption}
+      data-state={status}
+      onClick={onSelect}
+      onKeyDown={onKeyDown}
+      disabled={disabled}
+      role="radio"
+      aria-checked={checked}
+    >
       <span className={styles.letter} aria-hidden="true">{letter}</span>
       <span className={styles.text}>
         <InlineCodeText text={description} />
@@ -30,8 +40,8 @@ function AnswerOption({ letter, description, status, checked, onSelect, disabled
           {statusSymbol}
         </span>
       )}
-    </label>
+    </button>
   );
-}
+});
 
 export default AnswerOption;

@@ -40,19 +40,35 @@ Testing uses Node's built-in test runner via `npm test`.
 project-root/
 |-- api/
 |   `-- quiz.js
+|-- docs/
+|   |-- PRD.md
+|   |-- accessibility.md
+|   |-- architecture.md
+|   |-- css-modernization.md
+|   |-- mermaid.md
+|   |-- quiz-screen-loading-flow.md
+|   |-- quizapi-research.md
+|   |-- roadmap.md
+|   |-- specifications.md
+|   `-- visual-baselines/
+|       `-- initial/
+|           |-- README.md
+|           `-- *.png
 |-- src/
 |   |-- assets/
-|   |   `-- fonts/
-|   |   `-- png/
+|   |   |-- fonts/
+|   |   |-- png/
 |   |   `-- svg/
 |   |-- config/
 |   |   `-- quiz.js
 |   |-- components/
 |   |   |-- AnswerOption/
+|   |   |-- ArrowRightIcon/
 |   |   |-- Button/
 |   |   |-- ExitQuizModal/
 |   |   |-- ExplanationBox/
 |   |   |-- FeedbackMessage/
+|   |   |-- FormattedText/
 |   |   |-- QuestionCard/
 |   |   |-- QuizSelector/
 |   |   |-- ResultsCard/
@@ -75,8 +91,11 @@ project-root/
 |   |   |   |-- react.js
 |   |   |   |-- typescript.js
 |   |   |   `-- index.js
-|   |   `-- quizTopics.js
+|   |   |-- quizTopics.js
+|   |   `-- resultsMessages.js
 |   |-- utils/
+|   |   |-- formatCodeBlock.js
+|   |   |-- formatCodeBlock.test.js
 |   |   |-- normalizeQuizQuestion.js
 |   |   |-- normalizeQuizQuestion.test.js
 |   |   `-- shuffleArray.js
@@ -89,6 +108,9 @@ project-root/
 |-- .env.example
 `-- .gitignore
 ```
+
+See `docs/css-modernization.md` for the CSS rules, layer structure, visual
+checks, and implementation steps.
 
 ### Configuration
 
