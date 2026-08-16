@@ -4,7 +4,7 @@
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Center children horizontally */
     gap: var(--space-7); /* 32px gap between children */
-    width: 100%; /* Full width of the parent */
+    inline-size: 100%; /* Full width of the parent */
 }
 
 /* Score Ring animation */ 
@@ -22,8 +22,8 @@
     display: flex;
     align-items: center; /* Center children vertically */
     justify-content: center; /* Center children horizontally */
-    width: 280px; /* Fixed width for the score card */
-    height: 280px; /* Fixed height for the score card */
+    inline-size: min(17.5rem, 100%);
+    aspect-ratio: 1;
     flex-shrink: 0; /* Prevent shrinking */
 }
 
@@ -32,13 +32,13 @@
     position: absolute; /* Position absolute to overlay on the score card */
     inset: 0; /* Fill the parent container */
     border-radius: 50%; /* Make it a circle */
-    background: conic-gradient(var(--accent-primary-default) 0% var(--score-pct), var(--color-merino) 0);  /* gradient itself draws both colors in one shape */
+    background: conic-gradient(var(--accent-primary-default) 0% var(--score-pct), var(--surface-secondary) 0);  /* gradient itself draws both colors in one shape */
     transition: --score-pct 1s ease-out; /* Smooth transition for the score percentage change */
 }
 
 .scoreRingMask {
     position: absolute; /* centered in the score ring */
-    inset: 32px; /* 32px inset to create a mask effect */
+    inset: var(--space-7); /* 32px inset to create a mask effect */
     border-radius: 50%; /* Make it a circle */
     background: var(--surface-primary); /* Use the primary surface color for the mask */
 }
@@ -46,8 +46,7 @@
 /* Dashed decorative inner border */ 
 .scoreEllipseInsideBorder {
     position: absolute; /* Position absolute to overlay on the track */
-    width: 216px; /* Fixed width for the inner border */
-    height: 216px; /* Fixed height for the inner border */
+    inset: var(--space-7);
     border-radius: 50%; /* Make it a circle */
     border: var(--border-hairline) dashed var(--border-subtle); /* Dashed border for decoration */
 }
@@ -97,8 +96,8 @@
     align-items: center; 
     gap: var(--space-3); /* 16px gap between children */
     text-align: center; /* Center the text */
-    width: 100%; /* Full width of the parent */
-    max-width: 430px; /* set maximum width for resultsCopy */ 
+    inline-size: 100%; /* Full width of the parent */
+    max-inline-size: 26.875rem; /* set maximum width for resultsCopy */
 }
 
 /* for users with have a reduced motion preference, disable the animation */

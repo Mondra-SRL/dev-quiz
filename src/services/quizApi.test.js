@@ -24,6 +24,7 @@ const makeApiQuestions = (count) =>
 const mockSuccessfulResponse = (testContext, questions) => {
   testContext.mock.method(globalThis, "fetch", async () => ({
     ok: true,
+    headers: new Headers({ "content-type": "application/json" }),
     json: async () => ({ data: questions }),
   }));
 };
@@ -45,6 +46,22 @@ test("accepts an API source with the minimum number of questions", async (t) => 
   const questions = await fetchQuizQuestions(topic);
 
   assert.equal(questions.length, QUESTIONS_PER_QUIZ);
+});
+
+test("rejects an ok response that is not JSON", async (t) => {
+  // Reproduces a dev server serving the proxy's source instead of running it.
+  t.mock.method(globalThis, "fetch", async () => ({
+    ok: true,
+    headers: new Headers({ "content-type": "text/javascript" }),
+    json: async () => {
+      throw new SyntaxError("Unexpected token 'c', \"const QUIZ\"...");
+    },
+  }));
+
+  await assert.rejects(
+    () => fetchQuizQuestions(topic),
+    /Expected JSON from the quiz proxy, but received "text\/javascript"/,
+  );
 });
 
 test("accepts an API source with more than the minimum questions", async (t) => {
