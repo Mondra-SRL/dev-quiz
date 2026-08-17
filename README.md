@@ -1,171 +1,104 @@
 # DevQuiz
 
-A programming quiz application built with React and Vite.
+DevQuiz is a React application for practicing programming concepts in HTML, CSS, JavaScript, TypeScript, React, and Python. Choose a topic, answer a timed ten-question quiz, get immediate feedback and explanations, and review your final score.
 
-Users select a programming topic, complete a quiz, receive immediate feedback, and view their final score.
+🔗 [Try the live demo](https://dev-quiz-roan.vercel.app/)
 
-🔗 [Live demo](https://dev-quiz-roan.vercel.app/)
 
-## Documentation
+## Features
 
-Project documentation can be found in the `docs` folder:
-
-* PRD (Product Requirements Document)
-* Architecture
-* Roadmap
-
-Please review these documents before starting work on any issue.
+- Six quiz topics: HTML, CSS, JavaScript, TypeScript, React, and Python
+- Ten-minute quizzes with shuffled questions and answer options
+- Immediate answer validation, feedback, and explanations
+- Results for completed or expired quizzes, with retake and return-home actions
+- QuizAPI questions with bundled fallback questions when the API is unavailable
+- Responsive and accessible interface
 
 ## Tech Stack
 
-* React
-* Vite
-* CSS
-* Node.js
-* Vercel Functions
-* QuizAPI
+- React
+- Vite
+- JavaScript
+- CSS Modules
+- Vercel Functions
+- [QuizAPI](https://quizapi.io/)
 
-## Requirements
+## Run locally
 
-* Node.js
-* npm
+Requirements: Node.js and npm.
 
-This project uses `npm` as the package manager.
+1. Clone the repository and install dependencies:
 
-## Getting Started
+   ```bash
+   git clone <repository-url>
+   cd quiz-app
+   npm install
+   ```
 
-### Clone the Repository
+2. Create `.env` from `.env.example` and add your QuizAPI key:
 
-```bash
-git clone <repository-url>
-cd <repository-name>
-```
+   ```env
+   QUIZ_API_KEY=your_api_key_here
+   ```
 
-### Install Dependencies
+   The key is used only by the server-side Vercel Function. Never expose it with a `VITE_` prefix or commit `.env`.
 
-```bash
-npm install
-```
+3. Start the full local application:
 
-### Environment Variables
+   ```bash
+   npm run dev:vercel
+   ```
 
-Create a `.env` file in the project root using `.env.example` as a reference.
+   This starts the Vite frontend and the `/api/quiz` Vercel Function together. Open the local URL shown in the terminal. This requires a Vercel project that you own or can access.
 
-```env
-QUIZ_API_KEY=your_api_key_here
-```
+If you only want to view the frontend, use `npm run dev`. API requests will not be available, but the app can use its bundled fallback questions.
 
-Note:
+### Vercel environment
 
-* `QUIZ_API_KEY` is intended for the planned backend-proxy setup and must be read only by the Vercel Function.
-* Never expose this key to frontend code or prefix it with `VITE_`.
-* Never commit your `.env` file.
+`npm run dev:vercel` uses the Vercel CLI to run the Vite frontend and the `api/quiz.js` serverless function together. It must be linked to a Vercel project that you own or can access so the CLI can use that project's configuration and environment variables.
 
-### Vercel CLI
+The live demo belongs to a free-plan Vercel account that cannot add collaborators. As a result, other contributors cannot link their Vercel CLI to that project. To test the full Vercel environment:
 
-The planned backend proxy uses the Vercel CLI locally so the frontend and Vercel Functions can run together in one development environment.
+1. Fork this repository.
+2. Create a Vercel project from your fork.
+3. Add `QUIZ_API_KEY` to the project's environment variables.
+4. Clone your fork, run `npm install`, and link it to your Vercel project with `vercel link`.
+5. Run `npm run dev:vercel`.
 
-Add it as a project development dependency with:
+If you do not need to test the API proxy, use `npm run dev` and the app's bundled fallback questions instead.
 
-```bash
-npm install --save-dev vercel
-```
+## How it works
 
-Contributors who clone the repository normally only need to run `npm install`, because this dependency should already be declared in `package.json` as part of the required backend-proxy setup.
-
-### Start the Development Server
-
-Use one development mode at a time. Do not run both commands together.
-
-```bash
-npm run dev
-```
-
-Use this for frontend-only development. It starts only the Vite development server, so local `/api/*` Vercel Functions are not available.
-
-Planned backend-proxy development command:
-
-```bash
-npm run dev:vercel
-```
-
-Use this when developing or testing the complete application with the backend proxy.
-
-As part of the required backend-proxy setup, `npm run dev:vercel` should run `vercel dev`, which:
-
-* starts the Vite frontend;
-* serves the local Vercel Functions from the `api/` directory;
-* routes frontend `/api/*` requests to those functions;
-* provides a local environment similar to the deployed Vercel application.
-
-When this script is added, there is no need to run `npm run dev` in a second terminal because `vercel dev` starts the frontend itself.
-
-To test the app from another device on the same local network, start the dev server with host binding:
-
-```bash
-npm run dev -- --host
-```
-
-This is for frontend-only network testing and does not test the planned Vercel Function proxy.
-
-### Backend Proxy Flow
-
-Planned request flow:
+The frontend requests questions from `/api/quiz`. The Vercel Function keeps the QuizAPI key on the server, requests the selected quiz, and returns the data to the frontend. Questions are normalized and validated before use. If the request fails or does not return enough valid questions, the app loads the matching bundled fallback set from `src/data/fallbackQuestions/`.
 
 ```text
-React frontend
-    -> /api/quiz
-    -> Vercel Function
-    -> QuizAPI
+React frontend -> /api/quiz -> api/quiz.js -> QuizAPI
 ```
 
-In this setup, the frontend calls the local `/api/quiz` endpoint without receiving the QuizAPI key.
+## Project structure
 
-The Vercel Function reads `QUIZ_API_KEY` from the server environment, requests data from QuizAPI, and returns the response to the frontend.
-
-This allows the same relative `/api/*` route to be used locally and after deployment.
-
-## Project Structure
-
-```txt
-docs/
-api/
+```text
+api/                  # Server-side Vercel Functions
+public/               # Public assets and favicons
 src/
-public/
-.env.example
-package.json
-vite.config.js
+  assets/             # Fonts, logos, icons, and topic artwork
+  components/         # Reusable UI components
+  data/               # Topics, result messages, and fallback questions
+  screens/            # Home, quiz, and results screens
+  services/           # API client and question validation
+  styles/             # Global styles and design tokens
+  utils/              # Shared utilities
+
+docs/                 # Product, architecture, accessibility, and research docs
+.env.example          # Environment variable template
+package.json          # Scripts and dependencies
 ```
 
-`api/` is the planned location for the Vercel Functions used by the backend proxy.
+Additional commands:
 
-For the full application structure, refer to the Architecture document.
-
-## Contributing
-
-Before starting work:
-
-1. Review the PRD, Architecture, and Roadmap documents.
-2. Pick or assign yourself an issue.
-3. Create a feature branch.
-4. Open a Pull Request linked to the corresponding issue.
-
-Please keep implementations aligned with the agreed scope and architecture.
-
-## Current Scope
-
-The current project state includes:
-
-* Topic selection for HTML, CSS, JavaScript, TypeScript, React, and Python
-* Quiz flow from Home to Results
-* Question loading from QuizAPI with bundled fallback question sets per topic
-* Ten-question quiz sessions with shuffled questions and answer options
-* Immediate answer validation with per-question feedback
-* Question explanations, including a default fallback message when none is provided
-* Score tracking, final results, and retake or return-home actions
-* A direct exit-to-home action during the quiz
-* Timer countdown behavior 
-* Planned backend proxy work
-  
-For the complete scope, refer to the PRD.
-
+```bash
+npm run build        # Create a production build
+npm run preview      # Preview the production build
+npm run lint         # Run ESLint
+npm test             # Run automated tests
+```
