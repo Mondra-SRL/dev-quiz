@@ -2,7 +2,7 @@
 
 DevQuiz is a React application for practicing programming concepts in HTML, CSS, JavaScript, TypeScript, React, and Python. Choose a topic, answer a timed ten-question quiz, get immediate feedback and explanations, and review your final score.
 
-[🔗 Try the live demo](https://dev-quiz-roan.vercel.app/)
+🔗 [Try the live demo](https://dev-quiz-roan.vercel.app/)
 
 
 ## Features
