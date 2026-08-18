@@ -3,13 +3,8 @@ import ScreenLayout from "../../components/ScreenLayout";
 import LoadingState from "../../components/LoadingState";
 import ErrorState from "../../components/ErrorState";
 import QuizHeader from "../../components/QuizHeader";
-import QuestionCard from "../../components/QuestionCard/QuestionCard";
-import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
-import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
-import Button from "../../components/Button";
-import ArrowRightIcon from "../../components/ArrowRightIcon";
+import QuizQuestionPanel from "../../components/QuizQuestionPanel";
 import ExitQuizModal from "../../components/ExitQuizModal";
-import styles from "./QuizScreen.module.css";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
@@ -229,31 +224,14 @@ function QuizScreen({
         onOpenExitModal={handleOpenExitModal}
         exitButtonRef={exitButtonRef}
       />
-      <QuestionCard
-        question={currentQuestion.question}
-        answers={currentQuestion.answers}
-        correctAnswer={currentQuestion.correctAnswer}
+      <QuizQuestionPanel
+        question={currentQuestion}
         selectedAnswer={selectedAnswer}
+        isValidated={isValidated}
         onSelectAnswer={handleAnswerSelect}
+        onNextQuestion={handleNextQuestion}
+        nextButtonRef={nextButtonRef}
       />
-      {isValidated && (
-        <div className={styles.feedbackSection}>
-          <FeedbackMessage
-            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
-          />
-          <ExplanationBox explanation={currentQuestion.explanation} />
-        </div>
-      )}
-      <div ref={nextButtonRef}>
-        <Button
-          variant="primary"
-          disabled={!isValidated}
-          onClick={handleNextQuestion}
-        >
-          Next Question
-          <ArrowRightIcon disabled={!isValidated} />
-        </Button>
-      </div>
       </ScreenLayout>
 
       {isExitModalOpen && (
