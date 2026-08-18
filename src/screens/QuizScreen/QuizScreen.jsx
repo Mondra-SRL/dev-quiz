@@ -1,38 +1,25 @@
 import { useEffect, useState, useRef } from "react";
-import { Bars } from "react-loader-spinner";
 import ScreenLayout from "../../components/ScreenLayout";
-import QuestionCard from "../../components/QuestionCard/QuestionCard";
-import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
-import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
-import TimerBar from "../../components/TimerBar";
-import Button from "../../components/Button";
-import ArrowRightIcon from "../../components/ArrowRightIcon";
+import LoadingState from "../../components/LoadingState";
+import ErrorState from "../../components/ErrorState";
+import QuizHeader from "../../components/QuizHeader";
+import QuizQuestionPanel from "../../components/QuizQuestionPanel";
 import ExitQuizModal from "../../components/ExitQuizModal";
-import styles from "./QuizScreen.module.css";
-import logo from "../../assets/svg/logo-desktop-on-light.svg";
-import clockIcon from "../../assets/svg/clock-icon.svg";
-import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
-import { shuffleArray } from "../../utils/shuffleArray";
+import { prepareQuizQuestions } from "../../utils/quizQuestionSession";
 import {
-  QUESTIONS_PER_QUIZ,
+  formatQuizTime,
+  getQuizProgressPercentage,
+  getTimerAnnouncement,
+} from "../../utils/quizTimer";
+import {
+  QUIZ_LOAD_ERROR_MESSAGE,
   MIN_LOADING_DISPLAY_MS,
   QUIZ_DURATION_SECONDS,
 } from "../../config/quiz.js";
 
-const LOAD_ERROR_MESSAGE =
-  "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
-// announce only useful countdown milestones so screen-reader users are not
-// interrupted by an update every second.
-const TIMER_ANNOUNCEMENTS = {
-  300: "5 minutes remaining",
-  60: "1 minute remaining",
-  30: "30 seconds remaining",
-  10: "10 seconds remaining",
-  0: "Time is up",
-};
 
 function QuizScreen({
   selectedTopic,
@@ -87,18 +74,13 @@ function QuizScreen({
           resolvedQuestions = getFallbackQuestions(selectedTopic?.id);
         } catch (fallbackError) {
           console.warn(fallbackError);
-          setError(LOAD_ERROR_MESSAGE);
+          setError(QUIZ_LOAD_ERROR_MESSAGE);
           setIsLoading(false);
           return;
         }
       }
 
-      const sessionQuestions = shuffleArray(resolvedQuestions)
-        .slice(0, QUESTIONS_PER_QUIZ)
-        .map((question) => ({
-          ...question,
-          answers: shuffleArray(question.answers),
-        }));
+      const sessionQuestions = prepareQuizQuestions(resolvedQuestions);
 
       // keep the loading state visible long enough for users to notice it when
       // the API fails quickly and local fallback questions load immediately.
@@ -175,51 +157,11 @@ function QuizScreen({
 
   // set questions , loading branch and an error branch
   if (isLoading) {
-    return (
-      <ScreenLayout>
-        <section
-          className={styles.statusState}
-          role="status"
-          aria-live="polite"
-        >
-          <Bars
-            height="80"
-            width="80"
-            color="var(--color-olive-deep)"
-            ariaLabel="Loading quiz questions"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-          <div className={styles.statusCopy}>
-            <h1 className={styles.statusTitle}>Loading questions…</h1>
-            <p className={styles.statusMessage}>
-              We’re getting your quiz ready. This should only take a moment.
-            </p>
-          </div>
-          <Button variant="secondary" onClick={onCancel}>
-            Return Home
-          </Button>
-        </section>
-      </ScreenLayout>
-    );
+    return <LoadingState onCancel={onCancel} />;
   }
 
   if (error) {
-    return (
-      <ScreenLayout>
-        <section className={styles.statusState} role="alert">
-          <div className={styles.statusCopy}>
-            <p className={styles.errorLabel}>Unable to start quiz</p>
-            <h1 className={styles.statusTitle}>Something went wrong</h1>
-            <p className={styles.statusMessage}>{error}</p>
-          </div>
-          <Button variant="primary" onClick={onCancel}>
-            Return Home
-          </Button>
-        </section>
-      </ScreenLayout>
-    );
+    return <ErrorState error={error} onCancel={onCancel} />;
   }
 
   const handleNextQuestion = () => {
@@ -241,17 +183,14 @@ function QuizScreen({
     setIsValidated(false);
   };
 
-  // format seconds as MM:SS
-
-  const minutes = Math.floor(secondsRemaining / 60);
-  const seconds = secondsRemaining % 60;
-
-  const formattedTime = `${minutes}:${String(seconds).padStart(2, "0")}`;
+  const formattedTime = formatQuizTime(secondsRemaining);
   // keep the live region mounted, but give it content only on milestone
   // seconds so screen readers do not announce every countdown update.
-  const progressPercentage = (secondsRemaining / QUIZ_DURATION_SECONDS) * 100;
-
-  const timerAnnouncement = TIMER_ANNOUNCEMENTS[secondsRemaining] ?? "";
+  const progressPercentage = getQuizProgressPercentage(
+    secondsRemaining,
+    QUIZ_DURATION_SECONDS,
+  );
+  const timerAnnouncement = getTimerAnnouncement(secondsRemaining);
 
   function handleOpenExitModal() {
     setIsExitModalOpen(true);
@@ -269,90 +208,24 @@ function QuizScreen({
   return (
     <>
       <ScreenLayout inert={isExitModalOpen}>
-      <header className={styles.header}>
-        <div className={styles.rowTop}>
-          <img src={logo} alt="devquiz" className={styles.logo} />
-          <div className={styles.timerMeta}>
-            <img
-              src={clockIcon}
-              alt=""
-              aria-hidden="true"
-              className={styles.clockIcon}
-            />
-            <p className={styles.timerText}>{formattedTime}</p>
-            <p
-              className="visually-hidden"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {timerAnnouncement}
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.timerRow}>
-          <TimerBar percentage={progressPercentage} />
-        </div>
-
-        <div className={styles.rowSecondary}>
-          <p className={styles.questionCounter}>
-            Question {currentQuestionIndex + 1} of {totalQuestions}
-          </p>
-          <Button
-            ref={exitButtonRef}
-            variant="tertiary"
-            onClick={handleOpenExitModal}
-          >
-            EXIT QUIZ
-            <img
-              src={exitQuizIcon}
-              className={styles.exitQuizIcon}
-              alt=""
-              aria-hidden="true"
-            />
-          </Button>
-        </div>
-
-        <div className={styles.topicSummary}>
-          <img
-            src={selectedTopic.image}
-            alt=""
-            aria-hidden="true"
-            className={styles.topicIcon}
-          />
-          <div className={styles.topicText}>
-            <p className={styles.topicDescription}>
-              <span className={styles.topicName}>{selectedTopic.name}</span>{" "}
-              &gt; {selectedTopic.description}
-            </p>
-          </div>
-        </div>
-      </header>
-      <QuestionCard
-        question={currentQuestion.question}
-        answers={currentQuestion.answers}
-        correctAnswer={currentQuestion.correctAnswer}
-        selectedAnswer={selectedAnswer}
-        onSelectAnswer={handleAnswerSelect}
+      <QuizHeader
+        selectedTopic={selectedTopic}
+        totalQuestions={totalQuestions}
+        currentQuestionIndex={currentQuestionIndex}
+        formattedTime={formattedTime}
+        timerAnnouncement={timerAnnouncement}
+        progressPercentage={progressPercentage}
+        onOpenExitModal={handleOpenExitModal}
+        exitButtonRef={exitButtonRef}
       />
-      {isValidated && (
-        <div className={styles.feedbackSection}>
-          <FeedbackMessage
-            isCorrect={selectedAnswer === currentQuestion.correctAnswer}
-          />
-          <ExplanationBox explanation={currentQuestion.explanation} />
-        </div>
-      )}
-      <div ref={nextButtonRef}>
-        <Button
-          variant="primary"
-          disabled={!isValidated}
-          onClick={handleNextQuestion}
-        >
-          Next Question
-          <ArrowRightIcon disabled={!isValidated} />
-        </Button>
-      </div>
+      <QuizQuestionPanel
+        question={currentQuestion}
+        selectedAnswer={selectedAnswer}
+        isValidated={isValidated}
+        onSelectAnswer={handleAnswerSelect}
+        onNextQuestion={handleNextQuestion}
+        nextButtonRef={nextButtonRef}
+      />
       </ScreenLayout>
 
       {isExitModalOpen && (

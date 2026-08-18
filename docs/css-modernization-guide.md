@@ -1,4 +1,4 @@
-# CSS modernization
+# DevQuiz CSS Modernization Guide
 
 ## Goal
 

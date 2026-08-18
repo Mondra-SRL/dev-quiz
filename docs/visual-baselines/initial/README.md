@@ -55,4 +55,4 @@ Every screen and state below must be captured at all four viewports.
 
 
 Use the viewport dimensions and accessibility checks defined in
-`docs/css-modernization.md`. Do not mark this baseline approved until every required image has been reviewed.
+`docs/css-modernization-guide.md`. Do not mark this baseline approved until every required image has been reviewed.
