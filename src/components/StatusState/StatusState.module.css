@@ -1,0 +1,45 @@
+.statusState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-7);
+  inline-size: 100%;
+  min-block-size: clamp(24rem, 55vh, 36rem);
+  text-align: center;
+}
+
+.statusCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  inline-size: 100%;
+}
+
+.statusMessage {
+  max-inline-size: 48rem;
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-relaxed);
+}
+
+.statusTitle {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--fs-4xl);
+  line-height: var(--lh-normal);
+}
+
+.errorLabel {
+  color: var(--accent-tertiary-strong);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-widest);
+  text-transform: uppercase;
+}
+
+@media (max-width: 48em) {
+  .statusTitle { font-size: var(--fs-3xl); }
+  .statusMessage { font-size: var(--fs-base); }
+}

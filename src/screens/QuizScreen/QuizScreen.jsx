@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { Bars } from "react-loader-spinner";
 import ScreenLayout from "../../components/ScreenLayout";
+import LoadingState from "../../components/LoadingState";
 import QuestionCard from "../../components/QuestionCard/QuestionCard";
 import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
 import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
@@ -9,6 +9,7 @@ import Button from "../../components/Button";
 import ArrowRightIcon from "../../components/ArrowRightIcon";
 import ExitQuizModal from "../../components/ExitQuizModal";
 import styles from "./QuizScreen.module.css";
+import statusStyles from "../../components/StatusState/StatusState.module.css";
 import logo from "../../assets/svg/logo-desktop-on-light.svg";
 import clockIcon from "../../assets/svg/clock-icon.svg";
 import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
@@ -175,44 +176,17 @@ function QuizScreen({
 
   // set questions , loading branch and an error branch
   if (isLoading) {
-    return (
-      <ScreenLayout>
-        <section
-          className={styles.statusState}
-          role="status"
-          aria-live="polite"
-        >
-          <Bars
-            height="80"
-            width="80"
-            color="var(--color-olive-deep)"
-            ariaLabel="Loading quiz questions"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-          <div className={styles.statusCopy}>
-            <h1 className={styles.statusTitle}>Loading questions…</h1>
-            <p className={styles.statusMessage}>
-              We’re getting your quiz ready. This should only take a moment.
-            </p>
-          </div>
-          <Button variant="secondary" onClick={onCancel}>
-            Return Home
-          </Button>
-        </section>
-      </ScreenLayout>
-    );
+    return <LoadingState onCancel={onCancel} />;
   }
 
   if (error) {
     return (
       <ScreenLayout>
-        <section className={styles.statusState} role="alert">
-          <div className={styles.statusCopy}>
-            <p className={styles.errorLabel}>Unable to start quiz</p>
-            <h1 className={styles.statusTitle}>Something went wrong</h1>
-            <p className={styles.statusMessage}>{error}</p>
+        <section className={statusStyles.statusState} role="alert">
+          <div className={statusStyles.statusCopy}>
+            <p className={statusStyles.errorLabel}>Unable to start quiz</p>
+            <h1 className={statusStyles.statusTitle}>Something went wrong</h1>
+            <p className={statusStyles.statusMessage}>{error}</p>
           </div>
           <Button variant="primary" onClick={onCancel}>
             Return Home
