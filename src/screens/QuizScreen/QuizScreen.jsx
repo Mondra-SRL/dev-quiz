@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import ScreenLayout from "../../components/ScreenLayout";
 import LoadingState from "../../components/LoadingState";
+import ErrorState from "../../components/ErrorState";
 import QuestionCard from "../../components/QuestionCard/QuestionCard";
 import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
 import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
@@ -9,7 +10,6 @@ import Button from "../../components/Button";
 import ArrowRightIcon from "../../components/ArrowRightIcon";
 import ExitQuizModal from "../../components/ExitQuizModal";
 import styles from "./QuizScreen.module.css";
-import statusStyles from "../../components/StatusState/StatusState.module.css";
 import logo from "../../assets/svg/logo-desktop-on-light.svg";
 import clockIcon from "../../assets/svg/clock-icon.svg";
 import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
@@ -180,20 +180,7 @@ function QuizScreen({
   }
 
   if (error) {
-    return (
-      <ScreenLayout>
-        <section className={statusStyles.statusState} role="alert">
-          <div className={statusStyles.statusCopy}>
-            <p className={statusStyles.errorLabel}>Unable to start quiz</p>
-            <h1 className={statusStyles.statusTitle}>Something went wrong</h1>
-            <p className={statusStyles.statusMessage}>{error}</p>
-          </div>
-          <Button variant="primary" onClick={onCancel}>
-            Return Home
-          </Button>
-        </section>
-      </ScreenLayout>
-    );
+    return <ErrorState error={error} onCancel={onCancel} />;
   }
 
   const handleNextQuestion = () => {

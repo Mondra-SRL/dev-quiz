@@ -40,6 +40,11 @@
 }
 
 @media (max-width: 48em) {
-  .statusTitle { font-size: var(--fs-3xl); }
-  .statusMessage { font-size: var(--fs-base); }
+  .statusTitle {
+    font-size: var(--fs-3xl);
+  }
+
+  .statusMessage {
+    font-size: var(--fs-base);
+  }
 }
