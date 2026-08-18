@@ -23,12 +23,11 @@ import {
 } from "../../utils/quizTimer";
 import {
   QUESTIONS_PER_QUIZ,
+  QUIZ_LOAD_ERROR_MESSAGE,
   MIN_LOADING_DISPLAY_MS,
   QUIZ_DURATION_SECONDS,
 } from "../../config/quiz.js";
 
-const LOAD_ERROR_MESSAGE =
-  "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
 
 function QuizScreen({
@@ -84,7 +83,7 @@ function QuizScreen({
           resolvedQuestions = getFallbackQuestions(selectedTopic?.id);
         } catch (fallbackError) {
           console.warn(fallbackError);
-          setError(LOAD_ERROR_MESSAGE);
+          setError(QUIZ_LOAD_ERROR_MESSAGE);
           setIsLoading(false);
           return;
         }

@@ -1,12 +1,4 @@
-// announce only useful countdown milestones so screen-reader users are not
-// interrupted by an update every second.
-export const TIMER_ANNOUNCEMENTS = {
-  300: "5 minutes remaining",
-  60: "1 minute remaining",
-  30: "30 seconds remaining",
-  10: "10 seconds remaining",
-  0: "Time is up",
-};
+import { TIMER_ANNOUNCEMENTS } from "../config/quiz.js";
 
 export function formatQuizTime(totalSeconds) {
   const minutes = Math.floor(totalSeconds / 60);
