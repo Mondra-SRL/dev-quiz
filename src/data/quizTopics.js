@@ -11,7 +11,7 @@ const quizTopics = [
     name: 'HTML',
     image: htmlLogo,
     description: 'the standard markup language for structuring web page content using elements and tags.',
-    apiQuizId: 'cms3a30pt0lesfbut0jx2p576',
+    apiQuizId: 'cmsyy33660qadfbutxyq0nqzl',
   },
   {
     id: 'CSS',

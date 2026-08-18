@@ -1,4 +1,4 @@
-// Mirrors the QuizAPI "HTML" quiz (quiz_id cms3a30pt0lesfbut0jx2p576) one-to-one.
+// Mirrors the QuizAPI "HTML" quiz (quiz_id cmsyy33660qadfbutxyq0nqzl) one-to-one.
 // Content is intentionally identical to the API response so the fallback is
 // indistinguishable from a live fetch. Re-pull from the API if the quiz changes.
 const htmlQuestions = [
@@ -24,7 +24,7 @@ const htmlQuestions = [
       "url"
     ],
     correctAnswer: "a",
-    explanation: "the anchor tag is used for hyperlinks"
+    explanation: "The anchor tag is used for hyperlinks"
   },
   {
     id: 'html-3',
@@ -36,7 +36,7 @@ const htmlQuestions = [
       "head"
     ],
     correctAnswer: "h1",
-    explanation: "the h1 tag will yield the biggest header"
+    explanation: "The h1 tag will yield the biggest header"
   },
   {
     id: 'html-4',
@@ -48,7 +48,7 @@ const htmlQuestions = [
       "newline"
     ],
     correctAnswer: "br",
-    explanation: "a br tag will insert a line break"
+    explanation: "A br tag will insert a line break"
   },
   {
     id: 'html-5',
@@ -60,7 +60,7 @@ const htmlQuestions = [
       "src"
     ],
     correctAnswer: "alt",
-    explanation: "the alt tag provides an alternative text for images"
+    explanation: "The alt tag provides an alternative text for images"
   },
   {
     id: 'html-6',
@@ -72,7 +72,7 @@ const htmlQuestions = [
       "dl"
     ],
     correctAnswer: "ul",
-    explanation: "the ul tag is for unordered lists"
+    explanation: "The ul tag is for unordered lists"
   },
   {
     id: 'html-7',
@@ -84,7 +84,7 @@ const htmlQuestions = [
       "th"
     ],
     correctAnswer: "tr",
-    explanation: "the tr table is for a table row"
+    explanation: "The tr table is for a table row"
   },
   {
     id: 'html-8',
@@ -96,7 +96,7 @@ const htmlQuestions = [
       "code"
     ],
     correctAnswer: "script",
-    explanation: "the script opening and closing tags allow you to put JavaScript into your HTML file."
+    explanation: "The script opening and closing tags allow you to put JavaScript into your HTML file."
   },
   {
     id: 'html-9',
@@ -120,7 +120,7 @@ const htmlQuestions = [
       "target"
     ],
     correctAnswer: "target",
-    explanation: "the target attribute points to where to open a linked document."
+    explanation: "The target attribute points to where to open a linked document."
   }
 ];
 
