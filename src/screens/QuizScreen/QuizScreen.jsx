@@ -7,14 +7,13 @@ import QuizQuestionPanel from "../../components/QuizQuestionPanel";
 import ExitQuizModal from "../../components/ExitQuizModal";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
-import { shuffleArray } from "../../utils/shuffleArray";
+import { prepareQuizQuestions } from "../../utils/quizQuestionSession";
 import {
   formatQuizTime,
   getQuizProgressPercentage,
   getTimerAnnouncement,
 } from "../../utils/quizTimer";
 import {
-  QUESTIONS_PER_QUIZ,
   QUIZ_LOAD_ERROR_MESSAGE,
   MIN_LOADING_DISPLAY_MS,
   QUIZ_DURATION_SECONDS,
@@ -81,12 +80,7 @@ function QuizScreen({
         }
       }
 
-      const sessionQuestions = shuffleArray(resolvedQuestions)
-        .slice(0, QUESTIONS_PER_QUIZ)
-        .map((question) => ({
-          ...question,
-          answers: shuffleArray(question.answers),
-        }));
+      const sessionQuestions = prepareQuizQuestions(resolvedQuestions);
 
       // keep the loading state visible long enough for users to notice it when
       // the API fails quickly and local fallback questions load immediately.
