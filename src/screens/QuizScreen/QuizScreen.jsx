@@ -17,6 +17,11 @@ import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
 import {
+  formatQuizTime,
+  getQuizProgressPercentage,
+  getTimerAnnouncement,
+} from "../../utils/quizTimer";
+import {
   QUESTIONS_PER_QUIZ,
   MIN_LOADING_DISPLAY_MS,
   QUIZ_DURATION_SECONDS,
@@ -25,15 +30,6 @@ import {
 const LOAD_ERROR_MESSAGE =
   "We couldn't load enough valid questions for this quiz. Please return home and try again.";
 
-// announce only useful countdown milestones so screen-reader users are not
-// interrupted by an update every second.
-const TIMER_ANNOUNCEMENTS = {
-  300: "5 minutes remaining",
-  60: "1 minute remaining",
-  30: "30 seconds remaining",
-  10: "10 seconds remaining",
-  0: "Time is up",
-};
 
 function QuizScreen({
   selectedTopic,
@@ -202,17 +198,14 @@ function QuizScreen({
     setIsValidated(false);
   };
 
-  // format seconds as MM:SS
-
-  const minutes = Math.floor(secondsRemaining / 60);
-  const seconds = secondsRemaining % 60;
-
-  const formattedTime = `${minutes}:${String(seconds).padStart(2, "0")}`;
+  const formattedTime = formatQuizTime(secondsRemaining);
   // keep the live region mounted, but give it content only on milestone
   // seconds so screen readers do not announce every countdown update.
-  const progressPercentage = (secondsRemaining / QUIZ_DURATION_SECONDS) * 100;
-
-  const timerAnnouncement = TIMER_ANNOUNCEMENTS[secondsRemaining] ?? "";
+  const progressPercentage = getQuizProgressPercentage(
+    secondsRemaining,
+    QUIZ_DURATION_SECONDS,
+  );
+  const timerAnnouncement = getTimerAnnouncement(secondsRemaining);
 
   function handleOpenExitModal() {
     setIsExitModalOpen(true);
