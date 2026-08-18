@@ -1,4 +1,4 @@
-# DEVQUIZ - ROADMAP
+# DevQuiz Roadmap
 
 This roadmap reflects the agreed implementation order, the current repository state, and the existing GitHub issues.
 
@@ -58,7 +58,7 @@ Status key: Completed | In progress | Pending
 
 - QuizAPI research, topic selection, and topic quiz ids are recorded in the repo.
 - One QuizAPI quiz is configured per topic in `quizTopics.js`.
-- The selected quiz data and validation notes are tracked in `quizapi-research.md`.
+- The selected quiz data and validation notes are tracked in `quizapi-integration-guide.md`.
 
 ## Phase 10 - Fallback Questions [Completed]
 

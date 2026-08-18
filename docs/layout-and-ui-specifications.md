@@ -1,4 +1,4 @@
-# DevQuiz — Layout & UI Pattern Specification
+# DevQuiz Layout and UI Specifications
 
 **Source:** Figma file `Quiz-App`, page "UI Design" that contains Home, Quiz, and Results frames plus the Exit Confirmation modal. [Link](https://www.figma.com/design/bjSH4xpgWptKjggpjRC2y6/Quiz-App?node-id=4-31&p=f&t=zNJawqOzk5e19gVk-0)
 

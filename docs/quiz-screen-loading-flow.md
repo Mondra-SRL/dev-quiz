@@ -34,4 +34,4 @@ flowchart TD
     START_TIMER --> READY([Display first question])
 ```
 
-For the complete user journey, see the [Quiz App user flow](./mermaid.md).
+For the complete user journey, see the [Quiz App user flow](./user-flow.md).

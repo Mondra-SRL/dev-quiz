@@ -1,4 +1,4 @@
-# DEVQUIZ - PRODUCT REQUIREMENTS
+# DevQuiz Product Requirements
 
 ## GOAL
 Create a programming quiz application where users can practice programming concepts through topic-specific quizzes.

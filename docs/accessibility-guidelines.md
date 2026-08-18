@@ -1,4 +1,4 @@
-# Accessibility
+# DevQuiz Accessibility Guidelines
 
 DevQuiz targets WCAG 2.2 AA. Accessibility behavior is implemented in shared tokens and components so every screen receives the same baseline.
 
