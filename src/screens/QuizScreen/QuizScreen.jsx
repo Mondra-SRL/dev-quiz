@@ -2,17 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import ScreenLayout from "../../components/ScreenLayout";
 import LoadingState from "../../components/LoadingState";
 import ErrorState from "../../components/ErrorState";
+import QuizHeader from "../../components/QuizHeader";
 import QuestionCard from "../../components/QuestionCard/QuestionCard";
 import FeedbackMessage from "../../components/FeedbackMessage/FeedbackMessage";
 import ExplanationBox from "../../components/ExplanationBox/ExplanationBox";
-import TimerBar from "../../components/TimerBar";
 import Button from "../../components/Button";
 import ArrowRightIcon from "../../components/ArrowRightIcon";
 import ExitQuizModal from "../../components/ExitQuizModal";
 import styles from "./QuizScreen.module.css";
-import logo from "../../assets/svg/logo-desktop-on-light.svg";
-import clockIcon from "../../assets/svg/clock-icon.svg";
-import exitQuizIcon from "../../assets/svg/exit-quiz-icon.svg";
 import { fetchQuizQuestions } from "../../services/quizApi";
 import { getFallbackQuestions } from "../../data/fallbackQuestions";
 import { shuffleArray } from "../../utils/shuffleArray";
@@ -222,65 +219,16 @@ function QuizScreen({
   return (
     <>
       <ScreenLayout inert={isExitModalOpen}>
-      <header className={styles.header}>
-        <div className={styles.rowTop}>
-          <img src={logo} alt="devquiz" className={styles.logo} />
-          <div className={styles.timerMeta}>
-            <img
-              src={clockIcon}
-              alt=""
-              aria-hidden="true"
-              className={styles.clockIcon}
-            />
-            <p className={styles.timerText}>{formattedTime}</p>
-            <p
-              className="visually-hidden"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {timerAnnouncement}
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.timerRow}>
-          <TimerBar percentage={progressPercentage} />
-        </div>
-
-        <div className={styles.rowSecondary}>
-          <p className={styles.questionCounter}>
-            Question {currentQuestionIndex + 1} of {totalQuestions}
-          </p>
-          <Button
-            ref={exitButtonRef}
-            variant="tertiary"
-            onClick={handleOpenExitModal}
-          >
-            EXIT QUIZ
-            <img
-              src={exitQuizIcon}
-              className={styles.exitQuizIcon}
-              alt=""
-              aria-hidden="true"
-            />
-          </Button>
-        </div>
-
-        <div className={styles.topicSummary}>
-          <img
-            src={selectedTopic.image}
-            alt=""
-            aria-hidden="true"
-            className={styles.topicIcon}
-          />
-          <div className={styles.topicText}>
-            <p className={styles.topicDescription}>
-              <span className={styles.topicName}>{selectedTopic.name}</span>{" "}
-              &gt; {selectedTopic.description}
-            </p>
-          </div>
-        </div>
-      </header>
+      <QuizHeader
+        selectedTopic={selectedTopic}
+        totalQuestions={totalQuestions}
+        currentQuestionIndex={currentQuestionIndex}
+        formattedTime={formattedTime}
+        timerAnnouncement={timerAnnouncement}
+        progressPercentage={progressPercentage}
+        onOpenExitModal={handleOpenExitModal}
+        exitButtonRef={exitButtonRef}
+      />
       <QuestionCard
         question={currentQuestion.question}
         answers={currentQuestion.answers}
