@@ -65,11 +65,15 @@ project-root/
 |   |   |-- AnswerOption/
 |   |   |-- ArrowRightIcon/
 |   |   |-- Button/
+|   |   |-- ErrorState/
 |   |   |-- ExitQuizModal/
 |   |   |-- ExplanationBox/
 |   |   |-- FeedbackMessage/
 |   |   |-- FormattedText/
+|   |   |-- LoadingState/
 |   |   |-- QuestionCard/
+|   |   |-- QuizHeader/
+|   |   |-- QuizQuestionPanel/
 |   |   |-- QuizSelector/
 |   |   |-- ResultsCard/
 |   |   |-- ScreenLayout/
@@ -98,6 +102,10 @@ project-root/
 |   |   |-- formatCodeBlock.test.js
 |   |   |-- normalizeQuizQuestion.js
 |   |   |-- normalizeQuizQuestion.test.js
+|   |   |-- quizQuestionSession.js
+|   |   |-- quizQuestionSession.test.js
+|   |   |-- quizTimer.js
+|   |   |-- quizTimer.test.js
 |   |   `-- shuffleArray.js
 |   |-- styles/
 |   |   |-- globals.css
@@ -114,8 +122,12 @@ checks, and implementation steps.
 
 ### Configuration
 
-- `config/quiz.js`: Stores shared quiz timing and question-count rules.
-  - `QUESTIONS_PER_QUIZ`: Number of questions required from a source and selected for one quiz session after the valid source questions are shuffled.
+- `config/quiz.js`: Stores shared quiz timing, question-count, loading-error, and timer-announcement constants.
+  - `QUESTIONS_PER_QUIZ`: Number of questions required from a source and selected for one quiz session after valid source questions are shuffled.
+  - `QUIZ_DURATION_SECONDS`: Full quiz countdown duration.
+  - `MIN_LOADING_DISPLAY_MS`: Minimum loading-state display time.
+  - `QUIZ_LOAD_ERROR_MESSAGE`: Error copy used when no valid question source is available.
+  - `TIMER_ANNOUNCEMENTS`: Accessibility announcements for selected countdown milestones.
 
 ### Components
 
@@ -130,11 +142,15 @@ Each component lives in its own folder (`ComponentName/`) containing the `.jsx` 
 - `TimerBar`: countdown display and progress bar
 - `ScreenLayout`: shared layout wrapper for screens with decorative canvas/card framing
 - `ExitQuizModal`: exit confirmation dialog
+- `LoadingState`: loading state with spinner and Return Home action
+- `ErrorState`: question-loading error state with Return Home action
+- `QuizHeader`: quiz branding, timer, progress bar, question counter, topic summary, and exit control
+- `QuizQuestionPanel`: current question, answer feedback, explanation, and Next Question control
 - `ResultsCard`: final results summary
 
 ### Screens
 
-Each screen lives in its own folder (`ScreenName/`) containing the `.jsx` file, a `.module.css` file, and an `index.js` barrel export.
+Each screen lives in its own folder (`ScreenName/`) containing the `.jsx` file and an `index.js` barrel export. A screen may also have a `.module.css` file when it owns screen-level styles. `QuizScreen` currently delegates its presentation styles to child components.
 
 - `HomeScreen`: Initial screen where users select a topic and start the quiz.
 - `QuizScreen`: Main quiz screen handling questions, answers, timer, and quiz progression.
@@ -164,7 +180,9 @@ Each topic object contains the information required by the Home screen and Quiz 
 ### Utilities
 
 - `normalizeQuizQuestion.js`: Normalizes and validates questions that are already in the app's internal question format. This shared validation contract applies to fallback questions and to API questions after `quizApi.js` maps the raw API response into the internal shape.
-- `shuffleArray.js`: Randomizes question and answer order.
+- `shuffleArray.js`: Randomizes an array without mutating the source.
+- `quizQuestionSession.js`: Shuffles source questions, selects the configured session size, and shuffles each question's answers.
+- `quizTimer.js`: Formats countdown values, calculates progress percentages, and resolves milestone announcements.
 - `getValidQuizQuestions()` requires an array, normalizes every question, and throws if any question is invalid. It never returns a partially valid question set. Source modules require at least `QUESTIONS_PER_QUIZ` questions after normalization and validation.
 
 ## TESTING PURPOSE
@@ -250,7 +268,6 @@ Each screen has its own `.module.css` file co-located inside the screen folder.
 Examples:
 
 - `HomeScreen/HomeScreen.module.css`
-- `QuizScreen/QuizScreen.module.css`
 - `ResultsScreen/ResultsScreen.module.css`
 
 These files are responsible for screen-level layout and positioning.
@@ -324,53 +341,60 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 
 ### QuizScreen.jsx State
 
-`QuizScreen.jsx` owns active-session state:
+QuizScreen.jsx owns active-session state and coordinates extracted UI components and utilities:
 
-### `questions`
+### questions
 
-- Stores normalized quiz questions for the active session
-- Questions are randomized once after loading and remain fixed for that session
+- Stores the prepared questions for the active session
+- Questions are randomized once by quizQuestionSession.js and remain fixed for that session
 
-### `currentQuestionIndex`
+### currentQuestionIndex
 
 - Tracks which question is currently displayed
 
-### `selectedAnswer`
+### selectedAnswer
 
 - Stores the answer value selected for the current question
 
-### `hasAnswered`
+### isValidated
 
 - Indicates whether the current question has been answered
-- Used to lock answers, show feedback, show explanation, and enable the Next Question button
+- Locks answers, shows feedback and explanation, and enables Next Question
 
-### `remainingTime`
+### secondsRemaining
 
 - Stores the global countdown timer value for the full quiz
-- Drives the timer display, progress bar, and expiration behavior
+- Drives the timer values passed to QuizHeader and expiration behavior
 
-### `isExitModalOpen`
+### isExitModalOpen
 
 - Controls the exit confirmation modal
 - The global timer continues running while this modal is open
 
-### `isLoading`
+### isLoading
 
-- Tracks question loading state while the app resolves either API data or fallback/mock questions
-- Keeps a successful loading state visible for at least `MIN_LOADING_DISPLAY_MS` (currently 1 second), preventing a brief loader flash when questions resolve immediately
-- Shows a Return Home action while questions are loading
-- Returning Home unmounts `QuizScreen.jsx`; the effect cleanup aborts the active API request so it cannot update the screen afterward
-- The global timer remains stopped until a ready question set is stored and `isLoading` becomes `false`
+- Tracks question loading while API or fallback questions are resolved
+- Keeps successful loading visible for at least MIN_LOADING_DISPLAY_MS
+- Renders LoadingState while questions are being resolved
+- The loading effect aborts the active API request when the screen unmounts
+- The timer remains stopped until a ready question set is stored
 
-### `error`
+### error
 
-- Stores loading or API errors
-- API-related errors should not block quiz play if fallback/mock questions are available
+- Stores the question-loading error message
+- Renders ErrorState if both the API and fallback source fail
+
+### Shared callbacks
+
+- onSetTotalQuestions() reports the prepared session length to App.jsx
+- onIncrementScore() updates the shared score after a correct answer
+- onFinish("completed") or onFinish("expired") reports the quiz outcome to App.jsx
+- onCancel() exits the quiz and returns control to app-level navigation
 
 ### `quizStatus` updates
 
-- `QuizScreen.jsx` should set `quizStatus` to `completed` when the user finishes the last question before time expires
-- `QuizScreen.jsx` should set `quizStatus` to `expired` when the global timer reaches zero
+- `QuizScreen.jsx` calls `onFinish("completed")` when the user finishes the last question before time expires
+- `QuizScreen.jsx` calls `onFinish("expired")` when the global timer reaches zero
 - `ResultsScreen.jsx` should not mutate `quizStatus`
 
 ## SCREEN RESPONSIBILITIES
@@ -384,15 +408,14 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 
 ### QuizScreen.jsx
 
-- Displays the quiz title or app title, timer, progress bar, question indicator, current question, answer options, feedback, explanation, Next Question button, Exit Quiz button, and exit modal
-- Receives `selectedTopic` from `App.jsx`
-- Resolves quiz questions for the selected topic
-- Uses QuizAPI as the primary source and falls back to bundled mock questions if the API is unavailable, errors, or returns an unusable question set, including invalid questions or fewer than `QUESTIONS_PER_QUIZ`
-- Reports `totalQuestions` to `App.jsx`
-- Calls `incrementScore()` on each correct answer to update `score` in `App.jsx`
-- Updates `quizStatus` in `App.jsx` when the quiz is completed or expired
-- Manages question progression, answer validation, timer behavior, and exit confirmation
-- Redirects to Results when the quiz is completed or expired
+- Coordinates the active quiz session and passes state to extracted components
+- Resolves questions through quizApi.js with bundled fallback data when needed
+- Uses quizQuestionSession.js to create the randomized session question set
+- Reports totalQuestions to App.jsx
+- Calls onIncrementScore() on each correct answer
+- Calls onFinish("completed") or onFinish("expired") when the quiz ends
+- Manages question progression, answer validation, countdown timing, and exit confirmation
+- Renders LoadingState, ErrorState, QuizHeader, and QuizQuestionPanel for their respective UI responsibilities
 
 ### ResultsScreen.jsx
 
@@ -422,8 +445,8 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 4. `quizApi.js` calls the local `/api/quiz` Vercel Function.
 5. The Vercel Function requests quiz data from QuizAPI and returns the response to the frontend.
 6. `quizApi.js` validates and formats the response for the UI, or signals that fallback/mock questions should be used if the proxy or API response is unavailable or unusable.
-7. `QuizScreen.jsx` stores randomized questions locally and sends `totalQuestions` upward to `App.jsx`.
-8. Quiz interactions update local quiz state; `QuizScreen.jsx` calls `incrementScore()` on each correct answer and updates `quizStatus` through the setter or callback passed down from `App.jsx`.
+7. QuizScreen.jsx passes valid source questions to quizQuestionSession.js, stores the prepared session locally, and sends totalQuestions upward to App.jsx.
+8. Quiz interactions update local quiz state; QuizScreen.jsx calls onIncrementScore() on each correct answer and reports completion or expiration through onFinish().
 9. `App.jsx` switches to `results` when the quiz finishes or expires.
 10. `ResultsScreen.jsx` reads final shared state and offers either reset navigation back to `home` or a retake action that starts a new quiz session for the same topic.
 
@@ -438,7 +461,7 @@ It is reset to `null` when a new quiz session begins, including a Retake Quiz ac
 5. If QuizAPI returns valid questions, `quizApi.js` maps them into the internal question format and validates them.
 6. If QuizAPI is unavailable, errors, or returns no valid questions, bundled fallback/mock questions are loaded. Fallback questions are already authored in the internal format and are normalized/validated with the same shared rules before session use.
 7. While loading, the screen shows a loader and a Return Home action. Returning Home cancels the active API request through the loading effect's cleanup.
-8. The valid source questions are shuffled. QuizScreen.jsx selects 10 questions and shuffles their answer options.
+8. quizQuestionSession.js shuffles valid source questions, selects QUESTIONS_PER_QUIZ, and shuffles each question's answer options.
 9. If necessary, the successful path waits until the minimum loading display time has elapsed before storing the session questions and reporting 10 as totalQuestions.
 10. `QuizScreen.jsx` sets `isLoading` to `false`, and the global timer starts only after the questions are ready.
 11. The first question appears with Next Question disabled.
@@ -450,7 +473,7 @@ Answer validation is immediate. There is no Submit Answer button in the MVP.
 When the user selects an answer:
 
 1. Store the selected answer in `selectedAnswer`.
-2. Set `hasAnswered` to `true`.
+2. Set `isValidated` to `true`.
 3. Compare the selected answer value with `currentQuestion.correctAnswer`.
 4. If correct, increment `score`.
 5. Show visual feedback:
@@ -468,14 +491,14 @@ When the user clicks Next Question:
 
 1. If another question exists, increment `currentQuestionIndex`.
 2. Reset `selectedAnswer`.
-3. Reset `hasAnswered`.
+3. Reset `isValidated`.
 4. Hide feedback and explanation by returning the next question to its initial state.
 5. Disable Next Question until the next answer is validated.
 
 If the current question is the last one:
 
 1. Finish the quiz.
-2. Set `quizStatus` to `completed`.
+2. Call `onFinish("completed")`, allowing `App.jsx` to update the shared quiz status.
 3. Move to the Results screen.
 
 ### Timer Behavior
@@ -484,18 +507,18 @@ The quiz uses one global countdown timer for the entire session.
 
 Rules:
 
-- The timer starts when `QuizScreen.jsx` mounts and the questions are ready to display
+- The timer starts only after `QuizScreen.jsx` has a non-empty prepared question set and no loading or error state
 - The timer remains visible during the quiz
-- The progress bar decreases with `remainingTime`
+- The progress bar decreases with `secondsRemaining`, calculated before being passed to `QuizHeader`
 - The timer does not control question progression
 - The timer continues running while confirmation modals are open
 - The timer is implemented as an interval and must be cleaned up with `clearInterval(...)` when the quiz ends, the user exits, or the screen unmounts
 
-When `remainingTime` reaches zero:
+When `secondsRemaining` reaches zero:
 
 1. Stop and clean up the interval.
-2. Prevent `remainingTime` from going below zero.
-3. Set `quizStatus` to `expired`.
+2. Prevent `secondsRemaining` from going below zero.
+3. Call `onFinish("expired")`, allowing `App.jsx` to update the shared quiz status.
 4. Count unanswered questions as incorrect.
 5. Move the user to the Results screen.
 
@@ -504,7 +527,7 @@ No additional score adjustment is required because only correct answers increase
 When the user finishes the last question before time expires:
 
 1. Stop and clean up the interval.
-2. Set `quizStatus` to `completed`.
+2. Call `onFinish("completed")`, allowing `App.jsx` to update the shared quiz status.
 3. Move the user to the Results screen.
 
 When the user exits the quiz:
@@ -516,7 +539,7 @@ When the user exits the quiz:
 When the user retakes the quiz:
 
 1. `QuizScreen.jsx` unmounts and mounts again as a fresh screen.
-2. `remainingTime` resets automatically because it is local state inside `QuizScreen.jsx`.
+2. `secondsRemaining` resets automatically because it is local state inside `QuizScreen.jsx`.
 3. The timer starts again only after the new quiz session is ready.
 
 ### Exit Flow
@@ -774,3 +797,21 @@ If no valid question source is available at all:
 - Questions randomized at quiz start
 - Answer options randomized before display
 - API logic separated from UI logic
+## CURRENT QUIZSCREEN DECOMPOSITION
+
+QuizScreen.jsx is the coordinator for the active quiz session. It owns the session state, effects, callbacks, and state transitions, while delegated UI and pure calculations live in focused modules:
+
+- LoadingState: renders the loading UI and Return Home action.
+- ErrorState: renders the question-loading error UI and Return Home action.
+- QuizHeader: renders the logo, timer, progress bar, question counter, topic summary, and exit control.
+- QuizQuestionPanel: renders the current question, answer feedback, explanation, and Next Question control.
+- quizQuestionSession.js: prepares the session questions by shuffling questions, selecting the configured number, and shuffling answers.
+- quizTimer.js: formats timer text, calculates progress, and resolves accessibility announcements.
+- config/quiz.js: stores quiz timing, question-count, loading-error, and timer-announcement constants.
+
+QuizScreen remains responsible for:
+
+- Loading API questions and falling back to bundled questions.
+- Storing loading, error, question, answer, validation, timer, and exit-modal state.
+- Reporting total questions, score increments, completion, expiration, and cancellation to App.jsx.
+- Coordinating the extracted components through props and callbacks.
