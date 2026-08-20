@@ -160,7 +160,7 @@ project docs show exactly which QuizAPI resources the app depends on.
 
 | Topic | `quiz_id` | Title | Date selected | Notes |
 | --- | --- | --- | --- | --- |
-| `html` | `cms3lywwh0luafbutet1php2w` | HTML Quiz: Intermediate Level | `2026-07-27`| |
+| `html` | `cmsyy33660qadfbutxyq0nqzl` | HTML | `2026-08-18`| |
 | `css` | `cmnzv5hc400y32iutw5ywxii1` | CSS Layout & Flexbox | `2026-07-27` | |
 | `javascript` | `cmptrjx7502d07gut7cba4vvg` | JavaScript Async Interview Questions for Frontend Developers | `2026-07-27` | |
 | `typescript` | `cmnzuhit0000d2iutbobr9vzj` | TypeScript Type System Fundamentals | `2026-07-27` | |
