@@ -6,7 +6,7 @@ function LogoLink({ onNavigate, size = 'default' }) {
     if (!onNavigate) return;
 
     event.preventDefault();
-    onNavigate();
+    onNavigate(event);
   }
 
   const logoClassName = size === 'compact'

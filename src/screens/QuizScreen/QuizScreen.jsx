@@ -49,7 +49,9 @@ function QuizScreen({
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isValidated, setIsValidated] = useState(false);
   const nextButtonRef = useRef(null);
-  const exitButtonRef = useRef(null);
+  // Remember whether the logo or the Exit Quiz button opened the modal so
+  // keyboard focus can return to that same control when the modal closes.
+  const exitTriggerRef = useRef(null);
   const currentQuestion = questions[currentQuestionIndex];
   const [secondsRemaining, setSecondsRemaining] = useState(
     QUIZ_DURATION_SECONDS,
@@ -251,9 +253,10 @@ function QuizScreen({
   // seconds so screen readers do not announce every countdown update.
   const progressPercentage = (secondsRemaining / QUIZ_DURATION_SECONDS) * 100;
 
-  const timerAnnouncement = TIMER_ANNOUNCEMENTS[secondsRemaining] ?? "";
+  const timerAnnouncement = TIMER_ANNOUNCEMENTS[secondsRemaining] ?? "";  
 
-  function handleOpenExitModal() {
+  function handleOpenExitModal(event) {
+    exitTriggerRef.current = event.currentTarget;
     setIsExitModalOpen(true);
   }
 
@@ -271,7 +274,7 @@ function QuizScreen({
       <ScreenLayout inert={isExitModalOpen}>
       <header className={styles.header}>
         <div className={styles.rowTop}>
-          <LogoLink onNavigate={onCancel} size="compact" />
+          <LogoLink onNavigate={handleOpenExitModal} size="compact" />
           <div className={styles.timerMeta}>
             <img
               src={clockIcon}
@@ -299,7 +302,6 @@ function QuizScreen({
             Question {currentQuestionIndex + 1} of {totalQuestions}
           </p>
           <Button
-            ref={exitButtonRef}
             variant="tertiary"
             onClick={handleOpenExitModal}
           >
@@ -359,7 +361,7 @@ function QuizScreen({
         <ExitQuizModal
           onContinue={handleContinueQuiz}
           onExit={handleConfirmExit}
-          returnFocusRef={exitButtonRef}
+          returnFocusRef={exitTriggerRef}
         />
       )}
     </>
