@@ -1,9 +1,9 @@
 import { useRef, useEffect } from 'react';
 import styles from './HomeScreen.module.css';
-import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import QuizSelector from '../../components/QuizSelector';
 import ScreenLayout from '../../components/ScreenLayout';
 import Button from '../../components/Button';
+import LogoLink from '../../components/LogoLink';
 import quizTopics from '../../data/quizTopics';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
 
@@ -22,7 +22,7 @@ function HomeScreen({ selectedTopic, onSelectTopic, onStart }) {
   return (
     <ScreenLayout>
       <header className={styles.header}>
-        <img src={logo} alt="devquiz" className={styles.logo} />
+        <LogoLink />
         <div className={styles.headerCopy}>
           <h1>Sharpen your code skills,<br />one quiz at a time</h1>
           <p>Pick a topic and take a quick timed quiz.</p>

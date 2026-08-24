@@ -1,9 +1,9 @@
 import styles from './ResultsScreen.module.css';
-import logo from '../../assets/svg/logo-desktop-on-light.svg';
 import Button from '../../components/Button';
 import ResultsCard from '../../components/ResultsCard';
 import ScreenLayout from '../../components/ScreenLayout';
 import ArrowRightIcon from '../../components/ArrowRightIcon';
+import LogoLink from '../../components/LogoLink';
 import { QUIZ_STATUS_MESSAGES } from '../../data/resultsMessages'; 
 
 function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onRetakeQuiz}) {
@@ -11,7 +11,7 @@ function ResultsScreen({ score, totalQuestions, quizStatus, onReturnHome, onReta
   return (
     <ScreenLayout>
       <header className={styles.header}>
-      <img src={logo} alt="devquiz" className={styles.logo} />
+        <LogoLink onNavigate={onReturnHome} />
       </header>
 
       <section className={styles.quizContent} aria-labelledby="results-heading">

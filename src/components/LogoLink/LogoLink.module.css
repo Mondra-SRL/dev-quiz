@@ -1,0 +1,22 @@
+.link {
+  display: inline-flex;
+}
+
+.logo {
+  block-size: 2.75rem;
+  inline-size: auto;
+}
+
+.logo.compact {
+  block-size: 2.25rem;
+}
+
+@media (max-width: 48em) {
+  .logo {
+    block-size: 2.25rem;
+  }
+
+  .logo.compact {
+    block-size: var(--space-7);
+  }
+}
